@@ -16,12 +16,15 @@
 #include "stb_image.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void toggle_wireframe(bool isEnabled);
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 int main()
 {
+    bool wireframe_enabled = false;
+
     glfwInit();
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -31,7 +34,7 @@ int main()
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     #endif
 
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "GLFW Window", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "3dengine", NULL, NULL);
 
     if (window == NULL)
     {
@@ -142,6 +145,7 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        toggle_wireframe(wireframe_enabled);
 
         shader.use();
         glm::mat4 trans = glm::mat4(1.0f);
@@ -158,8 +162,10 @@ int main()
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        ImGui::Begin("Hello, world!");
-        ImGui::Text("This is some useful text.");
+        ImGui::Begin("3dengine");
+
+        ImGui::Checkbox("Wireframe", &wireframe_enabled);
+
         ImGui::End();
 
         ImGui::Render();
@@ -183,4 +189,15 @@ int main()
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
+}
+
+void toggle_wireframe(bool isEnabled) {
+  GLint polygonMode[2];
+  glGetIntegerv(GL_POLYGON_MODE, polygonMode);
+
+  if (isEnabled) {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  } else if (!isEnabled) {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  }
 }

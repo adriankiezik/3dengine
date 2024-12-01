@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Project name and C++ standard
-project(OpenGLApp)
+project(3dengine)
 set(CMAKE_CXX_STANDARD 17)
 
 # Add include directories
@@ -24,7 +24,7 @@ file(GLOB IMGUI_SOURCES "lib/imgui/*.cpp")
 file(GLOB IMGUI_BACKEND_SOURCES "lib/imgui/backends/*.cpp")  # Add backend files
 
 # Create a single executable (e.g., OpenGLApp)
-add_executable(OpenGLApp ${SOURCES} ${IMGUI_SOURCES} ${IMGUI_BACKEND_SOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES} ${IMGUI_SOURCES} ${IMGUI_BACKEND_SOURCES})
 
 # Link libraries
-target_link_libraries(OpenGLApp glad glfw ${OPENGL_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} glad glfw ${OPENGL_LIBRARIES})
