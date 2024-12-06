@@ -1,10 +1,7 @@
 #include <iostream>
-
 #include "window.h"
-
-#ifdef ENGINE_MODE
 #include "editor.h"
-#endif
+#include "cube.h"
 
 int main() {
   Window window("3dengine", 800, 600);
@@ -13,20 +10,20 @@ int main() {
     return -1;
   }
 
-#ifdef ENGINE_MODE
   Editor editor(window);
 
   if (!editor.initialize()) {
     return -1;
   }
-#endif
+
+  Cube cube;
+  cube.initialize();
 
   while (!window.shouldClose()) {
-    glClear(GL_COLOR_BUFFER_BIT);
-#ifdef ENGINE_MODE
-    editor.update();
-#endif
     window.update();
+    cube.update();
+    editor.update();
+    window.postUpdate();
   }
 
   return 0;

@@ -16,9 +16,16 @@ public:
   void update();
 
 private:
-  Window &window;
-  bool initialized = false;
+  Window &m_window;
+
+  bool m_initialized = false;
+  bool m_wireframe = false;
+  bool m_vsync = true;
+
   void renderMainMenu();
+  void renderFPSMenu();
+  void renderVsyncToggle();
+  void renderWireframeToggle();
 };
 
 #endif

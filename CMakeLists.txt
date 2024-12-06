@@ -4,10 +4,6 @@ cmake_minimum_required(VERSION 3.10)
 project(3dengine)
 set(CMAKE_CXX_STANDARD 17)
 
-if(EDITOR)  # assuming you have an option to define this
-    target_compile_definitions(MyGameEngine PRIVATE EDITOR_MODE)
-endif()
-
 # Add include directories
 include_directories(include)
 include_directories(lib/imgui)  # Add ImGui include directory first
@@ -29,6 +25,8 @@ file(GLOB IMGUI_BACKEND_SOURCES "lib/imgui/backends/*.cpp")  # Add backend files
 
 # Create a single executable (e.g., OpenGLApp)
 add_executable(${PROJECT_NAME} ${SOURCES} ${IMGUI_SOURCES} ${IMGUI_BACKEND_SOURCES})
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE EDITOR_MODE)
 
 # Link libraries
 target_link_libraries(${PROJECT_NAME} glad glfw ${OPENGL_LIBRARIES})
