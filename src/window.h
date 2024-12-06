@@ -20,6 +20,7 @@ public:
   int getWidth() const;
   int getHeight() const;
   int getFramesPerSecond() const;
+  float getDeltaTime() const;
 
   ~Window();
 
@@ -28,10 +29,14 @@ private:
   int m_height;
   const char *m_title;
   GLFWwindow *m_window;
+
   int m_renderedFrames;
   int m_framesPerSecond;
   float m_lastTime;
+  float m_lastFrame;
+  float m_deltaTime;
 
+  void calculateDeltaTime();
   static void framebufferSizeCallback(GLFWwindow *window, int width,
                                       int height);
 };

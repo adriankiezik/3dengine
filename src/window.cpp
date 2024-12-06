@@ -49,6 +49,8 @@ void Window::update() {
   float currentTime = glfwGetTime();
   m_renderedFrames++;
 
+  calculateDeltaTime();
+
   if (currentTime - m_lastTime >= 1.0f) {
     m_framesPerSecond = m_renderedFrames;
     m_renderedFrames = 0;
@@ -69,6 +71,12 @@ void Window::terminate() {
   glfwTerminate();
 }
 
+void Window::calculateDeltaTime() {
+    float currentFrame = glfwGetTime();
+    m_deltaTime = currentFrame - m_lastFrame;
+    m_lastFrame = currentFrame;
+}
+
 GLFWwindow *Window::getWindow() const { return m_window; }
 
 int Window::getFramesPerSecond() const { return m_framesPerSecond; }
@@ -76,6 +84,8 @@ int Window::getFramesPerSecond() const { return m_framesPerSecond; }
 int Window::getWidth() const { return m_width; }
 
 int Window::getHeight() const { return m_height; }
+
+float Window::getDeltaTime() const { return m_deltaTime; }
 
 void Window::framebufferSizeCallback(GLFWwindow *window, int width,
                                      int height) {
