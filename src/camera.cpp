@@ -21,7 +21,8 @@ glm::mat4 Camera::getViewMatrix() const
 
 glm::mat4 Camera::getProjectionMatrix(float aspectRatio) const
 {
-  return glm::perspective(glm::radians(fov), aspectRatio, 0.1f, 100.0f);
+  // Far is 1000.0f for now (should be changed later for performance)
+  return glm::perspective(glm::radians(fov), aspectRatio, 0.1f, 1000.0f);
 }
 
 void Camera::processKeyboardInput(GLFWwindow *window, float deltaTime)

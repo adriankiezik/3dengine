@@ -15,6 +15,7 @@ add_library(glad src/glad.c)
 # Find OpenGL and GLFW
 find_package(OpenGL REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
+find_package(assimp REQUIRED)
 
 # Find all .cpp files in the src directory
 file(GLOB SOURCES "src/*.cpp")
@@ -29,4 +30,4 @@ add_executable(${PROJECT_NAME} ${SOURCES} ${IMGUI_SOURCES} ${IMGUI_BACKEND_SOURC
 target_compile_definitions(${PROJECT_NAME} PRIVATE EDITOR_MODE)
 
 # Link libraries
-target_link_libraries(${PROJECT_NAME} glad glfw ${OPENGL_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} glad glfw assimp::assimp ${OPENGL_LIBRARIES})

@@ -85,7 +85,7 @@ void Editor::renderFPSMenu()
 void Editor::renderWireframeToggle()
 {
   toggleWireframeMode();
-  ImGui::Checkbox("Toggle Wireframe", &wireframe);
+  ImGui::Checkbox("Wireframe", &wireframe);
 }
 
 void Editor::toggleWireframeMode()
