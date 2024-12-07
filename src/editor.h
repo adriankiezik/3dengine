@@ -12,7 +12,6 @@ public:
   ~Editor();
 
   bool initialize();
-  void shutdown();
   void update();
 
 private:

@@ -12,7 +12,6 @@ public:
     InputHandler(Camera* camera, Window &window);
     void update();
     static void initialize();
-    static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 
 private:
     static Camera* s_camera;
@@ -20,6 +19,10 @@ private:
     static float s_lastX;
     static float s_lastY;
     static bool s_firstMouse;
+    bool isF1Pressed;
+
+    static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
+    static void toggleCameraInputHandling();
 };
 
 #endif

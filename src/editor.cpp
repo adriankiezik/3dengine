@@ -4,15 +4,20 @@
 
 Editor::Editor(Window &window) : m_window(window) {}
 
-Editor::~Editor() { shutdown(); }
+Editor::~Editor() { 
+    if (m_initialized) {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
+    m_initialized = false;
+  }
+}
 
 bool Editor::initialize() {
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO &io = ImGui::GetIO();
-
-  io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
   ImGui::StyleColorsDark();
 
@@ -22,16 +27,6 @@ bool Editor::initialize() {
   m_initialized = true;
 
   return true;
-}
-
-void Editor::shutdown() {
-  if (m_initialized) {
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
-
-    m_initialized = false;
-  }
 }
 
 void Editor::update() {

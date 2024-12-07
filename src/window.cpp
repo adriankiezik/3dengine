@@ -1,4 +1,5 @@
 #include "window.h"
+#include <imgui.h>
 
 Window::Window(const std::string &title, int width, int height)
     : m_width(width), m_height(height), m_title(title.c_str()),
@@ -49,6 +50,7 @@ void Window::update() {
   float currentTime = glfwGetTime();
   m_renderedFrames++;
 
+  updateMousePosition();
   calculateDeltaTime();
 
   if (currentTime - m_lastTime >= 1.0f) {
@@ -96,6 +98,14 @@ void Window::framebufferSizeCallback(GLFWwindow *window, int width,
     win->m_width = width;
     win->m_height = height;
   }
+}
+
+void Window::updateMousePosition()
+{
+    double mouseX, mouseY;
+    glfwGetCursorPos(m_window, &mouseX, &mouseY);
+    ImGuiIO& io = ImGui::GetIO();
+    io.MousePos = ImVec2((float)mouseX, (float)mouseY);
 }
 
 Window::~Window() { terminate(); }

@@ -39,6 +39,7 @@ private:
   void calculateDeltaTime();
   static void framebufferSizeCallback(GLFWwindow *window, int width,
                                       int height);
+  void updateMousePosition();
 };
 
 #endif

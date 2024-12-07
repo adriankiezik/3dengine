@@ -28,7 +28,15 @@ public:
     void processKeyboardInput(GLFWwindow *window, float deltaTime);
     void processMouseInput(float xOffset, float yOffset, bool constrainPitch = true);
 
+    bool isMouseInputEnabled() const;
+    bool isKeyboardInputEnabled() const;
+
+    void toggleMouseInput();
+    void toggleKeyboardInput();
 private:
+    bool m_mouseInputEnabled;
+    bool m_keyboardInputEnabled;
+
     void updateCameraVectors();
 };
 

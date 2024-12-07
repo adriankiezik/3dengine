@@ -1,7 +1,8 @@
 #include "Camera.h"
 
 Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch, float speed, float sensitivity, float fov)
-    : position(position), worldUp(up), yaw(yaw), pitch(pitch), movementSpeed(speed), mouseSensitivity(sensitivity), fov(fov) {
+    : position(position), worldUp(up), yaw(yaw), pitch(pitch), movementSpeed(speed), mouseSensitivity(sensitivity), fov(fov),
+    m_mouseInputEnabled(true), m_keyboardInputEnabled(true) {
     updateCameraVectors();
 }
 
@@ -14,19 +15,27 @@ glm::mat4 Camera::getProjectionMatrix(float aspectRatio) const {
 }
 
 void Camera::processKeyboardInput(GLFWwindow *window, float deltaTime) {
-    float velocity = movementSpeed * deltaTime;
+  if (!m_keyboardInputEnabled) {
+    return;
+  }
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) 
-        position += front * velocity;
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) 
-        position -= front * velocity;
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) 
-        position -= right * velocity;
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) 
-        position += right * velocity;
+  float velocity = movementSpeed * deltaTime;
+
+  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) 
+      position += front * velocity;
+  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) 
+      position -= front * velocity;
+  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) 
+      position -= right * velocity;
+  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) 
+      position += right * velocity;
 }
 
 void Camera::processMouseInput(float xOffset, float yOffset, bool constrainPitch) {
+    if (!m_mouseInputEnabled) {
+      return;
+    }
+
     xOffset *= mouseSensitivity;
     yOffset *= mouseSensitivity;
 
@@ -42,6 +51,22 @@ void Camera::processMouseInput(float xOffset, float yOffset, bool constrainPitch
     }
 
     updateCameraVectors();
+}
+
+bool Camera::isMouseInputEnabled() const {
+  return m_mouseInputEnabled;
+}
+
+bool Camera::isKeyboardInputEnabled() const {
+  return m_keyboardInputEnabled;
+}
+
+void Camera::toggleMouseInput() {
+  m_mouseInputEnabled = !m_mouseInputEnabled;
+}
+
+void Camera::toggleKeyboardInput() {
+  m_keyboardInputEnabled = !m_keyboardInputEnabled;
 }
 
 void Camera::updateCameraVectors() {
