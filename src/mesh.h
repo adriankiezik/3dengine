@@ -1,5 +1,6 @@
 #include <vector>
 #include <glm/glm.hpp>
+#include "shader.h"
 
 #ifndef MESH_H
 #define MESH_H
@@ -29,7 +30,7 @@ public:
   Mesh(const std::vector<Vertex> &vertices,
        const std::vector<unsigned int> &indices,
        const std::vector<Texture> &textures);
-  void Draw(unsigned int shaderProgram);
+  void Draw(Shader &shader);
 
 private:
   unsigned int VBO, EBO;

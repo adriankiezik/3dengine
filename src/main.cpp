@@ -3,8 +3,8 @@
 #include "editor.h"
 #include "input_handler.h"
 #include "camera.h"
-#include "cube.h"
 #include "model.h"
+#include "scene.h"
 
 int main()
 {
@@ -27,13 +27,11 @@ int main()
   InputHandler inputHandler(&camera, window);
   inputHandler.init();
 
-  // Cube cube(camera);
-  // cube.init();
+  Scene scene;
 
-  Model myModel("/Users/adriankiezik/3dengine/resources/table/table.fbx",
-                "/Users/adriankiezik/3dengine/resources/table/");
+  Model myModel("/Users/adriankiezik/3dengine/resources/table/table.fbx");
 
-  Shader shader("../shaders/vertex_shader.glsl", "../shaders/fragment_shader_no_texture.glsl");
+  Shader shader("../shaders/vertex_shader.glsl", "../shaders/fragment_shader.glsl");
 
   glm::mat4 model = glm::mat4(1.0f);
 
@@ -41,12 +39,11 @@ int main()
   {
     inputHandler.update();
     window.update();
-    // cube.update();
     shader.use();
     shader.setMat4("model", model);
     shader.setMat4("view", camera.getViewMatrix());
     shader.setMat4("projection", camera.getProjectionMatrix(window.getWidth() / window.getHeight()));
-    myModel.Draw(shader.id);
+    myModel.Draw(shader);
     editor.update();
     window.postUpdate();
   }

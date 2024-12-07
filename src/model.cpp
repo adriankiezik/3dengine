@@ -6,21 +6,20 @@
 #include <assimp/matrix4x4.h>
 #include <glm/gtc/matrix_transform.hpp>
 
-Model::Model(const std::string &path, const std::string &textureDirectory)
+Model::Model(const std::string &path)
 {
-  this->textureDirectory = textureDirectory;
-  loadModel(path, textureDirectory);
+  loadModel(path);
 }
 
-void Model::Draw(unsigned int shaderProgram)
+void Model::Draw(Shader &shader)
 {
   for (Mesh &mesh : meshes)
   {
-    mesh.Draw(shaderProgram);
+    mesh.Draw(shader);
   }
 }
 
-void Model::loadModel(const std::string &path, const std::string &textureDirectory)
+void Model::loadModel(const std::string &path)
 {
   Assimp::Importer importer;
   const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
@@ -30,9 +29,6 @@ void Model::loadModel(const std::string &path, const std::string &textureDirecto
     std::cerr << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
     return;
   }
-
-  directory = path.substr(0, path.find_last_of('/'));
-  this->textureDirectory = textureDirectory;
 
   processNode(scene->mRootNode, scene);
 }
@@ -79,9 +75,8 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
 {
   std::vector<Vertex> vertices;
   std::vector<unsigned int> indices;
-  std::vector<Texture> textures;
 
-  glm::vec3 scaleFactor(0.1f, 0.1, 0.1f);
+  glm::vec3 scaleFactor(0.1f, 0.1f, 0.1f);
 
   // Process vertices
   for (unsigned int i = 0; i < mesh->mNumVertices; i++)
@@ -112,55 +107,33 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
     }
   }
 
-  if (mesh->mMaterialIndex >= 0)
-  {
-    aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
-    std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
-    textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-    std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
-    textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-  }
+  std::string diffusePath = "/Users/adriankiezik/3dengine/resources/table/DefaultMaterial_BaseColor.png";
+
+  std::vector<std::pair<std::string, std::string>> texturePaths = {
+      {"texture_diffuse", diffusePath}};
+
+  std::vector<Texture> textures = loadAllTextures(texturePaths);
 
   return Mesh(vertices, indices, textures);
 }
 
-std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, const std::string &typeName)
+std::vector<Texture> Model::loadAllTextures(std::vector<std::pair<std::string, std::string>> texturePaths)
 {
   std::vector<Texture> textures;
 
-  for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
+  for (const auto &[type, path] : texturePaths)
   {
-    aiString str;
-    mat->GetTexture(type, i, &str);
-
-    std::string textureFileName = std::string(str.C_Str());
-    size_t lastSlash = textureFileName.find_last_of("/\\"); // Find the last slash or backslash
-    if (lastSlash != std::string::npos)
-    {
-      textureFileName = textureFileName.substr(lastSlash + 1);
-    }
-
-    std::string correctedPath = textureDirectory + "/" + textureFileName;
-
-    if (loadedTextures.find(correctedPath) != loadedTextures.end())
-    {
-      textures.push_back(loadedTextures[correctedPath]);
-    }
-    else
-    {
-      Texture texture;
-      texture.id = loadTextureFromFile(correctedPath.c_str(), textureDirectory);
-      texture.type = typeName;
-      texture.path = correctedPath;
-      textures.push_back(texture);
-      loadedTextures[correctedPath] = texture;
-    }
+    Texture texture;
+    texture.id = loadTextureFromFile(path.c_str());
+    texture.type = type;
+    texture.path = path;
+    textures.push_back(texture);
   }
 
   return textures;
 }
 
-unsigned int Model::loadTextureFromFile(const char *path, const std::string &directory)
+unsigned int Model::loadTextureFromFile(const char *path)
 {
   std::string filename = std::string(path);
 

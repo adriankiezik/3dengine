@@ -1,5 +1,7 @@
 #include "mesh.h"
 #include <glad.h>
+#include <iostream>
+#include "shader.h"
 
 Mesh::Mesh(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices, const std::vector<Texture> &textures)
     : vertices(vertices), indices(indices), textures(textures)
@@ -7,17 +9,13 @@ Mesh::Mesh(const std::vector<Vertex> &vertices, const std::vector<unsigned int> 
   setupMesh();
 }
 
-void Mesh::Draw(unsigned int shaderProgram)
+void Mesh::Draw(Shader &shader)
 {
-  unsigned int diffuseNr = 1;
-  unsigned int specularNr = 1;
-
   for (unsigned int i = 0; i < textures.size(); i++)
   {
     glActiveTexture(GL_TEXTURE0 + i);
     std::string name = textures[i].type;
-    std::string number = (name == "texture_diffuse") ? std::to_string(diffuseNr++) : std::to_string(specularNr++);
-    glUniform1i(glGetUniformLocation(shaderProgram, (name + number).c_str()), i);
+    glUniform1i(glGetUniformLocation(shader.id, textures[i].type.c_str()), i);
     glBindTexture(GL_TEXTURE_2D, textures[i].id);
   }
 
