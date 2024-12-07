@@ -15,35 +15,31 @@ int main()
     return -1;
   }
 
-  Editor editor(window);
+  Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+
+  Scene scene(window, camera);
+
+  Editor editor(window, scene);
 
   if (!editor.init())
   {
     return -1;
   }
 
-  Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-
   InputHandler inputHandler(&camera, window);
   inputHandler.init();
 
-  Scene scene;
+  // Model tableModel("/Users/adriankiezik/3dengine/resources/table/table.obj",
+  //                  "../shaders/vertex_shader.glsl",
+  //                  "../shaders/fragment_shader.glsl");
 
-  Model myModel("/Users/adriankiezik/3dengine/resources/table/table.fbx");
-
-  Shader shader("../shaders/vertex_shader.glsl", "../shaders/fragment_shader.glsl");
-
-  glm::mat4 model = glm::mat4(1.0f);
+  // scene.addModel(tableModel);
 
   while (!window.shouldClose())
   {
     inputHandler.update();
     window.update();
-    shader.use();
-    shader.setMat4("model", model);
-    shader.setMat4("view", camera.getViewMatrix());
-    shader.setMat4("projection", camera.getProjectionMatrix(window.getWidth() / window.getHeight()));
-    myModel.Draw(shader);
+    scene.draw();
     editor.update();
     window.postUpdate();
   }

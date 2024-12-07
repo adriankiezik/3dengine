@@ -7,7 +7,7 @@ Camera::Camera(glm::vec3 position)
       pitch(0.0f),
       movementSpeed(2.5f),
       mouseSensitivity(0.1f),
-      fov(45.0f),
+      fov(65.0f),
       mouseInputEnabled(true),
       keyboardInputEnabled(true)
 {
@@ -22,7 +22,7 @@ glm::mat4 Camera::getViewMatrix() const
 glm::mat4 Camera::getProjectionMatrix(float aspectRatio) const
 {
   // Far is 1000.0f for now (should be changed later for performance)
-  return glm::perspective(glm::radians(fov), aspectRatio, 0.1f, 1000.0f);
+  return glm::perspective(glm::radians(fov), aspectRatio, 0.01f, 1000.0f);
 }
 
 void Camera::processKeyboardInput(GLFWwindow *window, float deltaTime)

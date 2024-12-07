@@ -5,11 +5,13 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "window.h"
+#include <imfilebrowser.h>
+#include "scene.h"
 
 class Editor
 {
 public:
-  explicit Editor(Window &window);
+  explicit Editor(Window &window, Scene &scene);
   ~Editor();
 
   bool init();
@@ -17,6 +19,13 @@ public:
 
 private:
   Window &window;
+  Scene &scene;
+
+  ImGui::FileBrowser modelDialog;
+  ImGui::FileBrowser diffuseDialog;
+
+  std::string modelPath;
+  std::string diffusePath;
 
   bool initialized = false;
   bool wireframe = false;

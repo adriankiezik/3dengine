@@ -6,23 +6,33 @@
 #include <assimp/matrix4x4.h>
 #include <glm/gtc/matrix_transform.hpp>
 
-Model::Model(const std::string &path)
+Model::Model(const std::string &modelPath,
+             std::vector<std::pair<std::string, std::string>> texturePaths,
+             const std::string &vertexShaderPath,
+             const std::string &fragmentShaderPath)
+    : shader(vertexShaderPath.c_str(), fragmentShaderPath.c_str())
 {
-  loadModel(path);
+  loadModel(modelPath, texturePaths);
 }
 
-void Model::Draw(Shader &shader)
+void Model::Draw(const glm::mat4 &view, const glm::mat4 &projection)
 {
+  shader.use();
+  shader.setMat4("view", view);
+  shader.setMat4("projection", projection);
+
   for (Mesh &mesh : meshes)
   {
+    glm::mat4 modelMatrix = glm::mat4(1.0f);
+    shader.setMat4("model", modelMatrix);
     mesh.Draw(shader);
   }
 }
 
-void Model::loadModel(const std::string &path)
+void Model::loadModel(const std::string &modelPath, std::vector<std::pair<std::string, std::string>> texturePaths)
 {
   Assimp::Importer importer;
-  const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+  const aiScene *scene = importer.ReadFile(modelPath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
   if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
   {
@@ -30,22 +40,22 @@ void Model::loadModel(const std::string &path)
     return;
   }
 
-  processNode(scene->mRootNode, scene);
+  processNode(scene->mRootNode, scene, texturePaths);
 }
 
-void Model::processNode(aiNode *node, const aiScene *scene)
+void Model::processNode(aiNode *node, const aiScene *scene, std::vector<std::pair<std::string, std::string>> texturePaths)
 {
   // Process each mesh in the node
   for (unsigned int i = 0; i < node->mNumMeshes; i++)
   {
     aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-    meshes.push_back(processMesh(mesh, scene));
+    meshes.push_back(processMesh(mesh, scene, texturePaths));
   }
 
   // Recursively process each child node
   for (unsigned int i = 0; i < node->mNumChildren; i++)
   {
-    processNode(node->mChildren[i], scene);
+    processNode(node->mChildren[i], scene, texturePaths);
   }
 
   // Apply the node transformation (including scale, rotation, and translation)
@@ -71,7 +81,7 @@ void Model::processNode(aiNode *node, const aiScene *scene)
   }
 }
 
-Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
+Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene, std::vector<std::pair<std::string, std::string>> texturePaths)
 {
   std::vector<Vertex> vertices;
   std::vector<unsigned int> indices;
@@ -106,11 +116,6 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
       indices.push_back(face.mIndices[j]);
     }
   }
-
-  std::string diffusePath = "/Users/adriankiezik/3dengine/resources/table/DefaultMaterial_BaseColor.png";
-
-  std::vector<std::pair<std::string, std::string>> texturePaths = {
-      {"texture_diffuse", diffusePath}};
 
   std::vector<Texture> textures = loadAllTextures(texturePaths);
 

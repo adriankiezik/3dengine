@@ -1,8 +1,9 @@
 #include "editor.h"
 #include <iostream>
 #include <sstream>
+#include "model.h"
 
-Editor::Editor(Window &window) : window(window) {}
+Editor::Editor(Window &window, Scene &scene) : window(window), scene(scene) {}
 
 Editor::~Editor()
 {
@@ -59,10 +60,74 @@ void Editor::renderMainMenu()
   ImGui::SetNextWindowCollapsed(true, ImGuiCond_Once);
   ImGui::Begin("3dengine");
 
-  renderWireframeToggle();
-  renderVsyncToggle();
+  if (ImGui::CollapsingHeader("Add model"))
+  {
+    ImGui::Text("Model:");
+    ImGui::SameLine();
+    ImGui::PushID(1);
+    const char *modelLabel = modelPath.empty() ? "None" : modelPath.c_str();
+    if (ImGui::Button(modelLabel))
+    {
+      modelDialog.SetTitle("Select model (.obj / .fbx)");
+      modelDialog.SetTypeFilters({".obj", ".fbx"});
+      modelDialog.Open();
+    }
+    ImGui::PopID();
+    ImGui::Text("Diffuse texture:");
+    ImGui::SameLine();
+    ImGui::PushID(2);
+    const char *diffuseLabel = diffusePath.empty() ? "None" : diffusePath.c_str();
+    if (ImGui::Button(diffuseLabel))
+    {
+      diffuseDialog.SetTitle("Select diffuse texture (.png / .jpg)");
+      diffuseDialog.SetTypeFilters({".png", ".jpg"});
+      diffuseDialog.Open();
+    }
+    ImGui::PopID();
+
+    ImGui::Spacing();
+
+    float window_width = ImGui::GetWindowWidth();
+    float button_width = 100.0f;
+    float x_center = (window_width - button_width) * 0.5f;
+
+    ImGui::SetCursorPosX(x_center);
+
+    if (ImGui::Button("Add to scene"))
+    {
+      std::vector<std::pair<std::string, std::string>> texturePaths = {
+          {"texture_diffuse", diffusePath}};
+
+      Model newModel(modelPath, texturePaths, "../shaders/vertex_shader.glsl", "../shaders/fragment_shader.glsl");
+      scene.addModel(newModel);
+
+      modelPath = "";
+      diffusePath = "";
+    }
+  }
+
+  if (ImGui::CollapsingHeader("Settings"))
+  {
+    renderWireframeToggle();
+    renderVsyncToggle();
+  }
 
   ImGui::End();
+
+  modelDialog.Display();
+  diffuseDialog.Display();
+
+  if (modelDialog.HasSelected())
+  {
+    modelPath = modelDialog.GetSelected().string();
+    modelDialog.ClearSelected();
+  }
+
+  if (diffuseDialog.HasSelected())
+  {
+    diffusePath = diffuseDialog.GetSelected().string();
+    diffuseDialog.ClearSelected();
+  }
 }
 
 void Editor::renderFPSMenu()
