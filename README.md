@@ -6,5 +6,8 @@ Required to run:
 
 To run:
 
+- mkdir build
 - cd build/
+- cmake ..
 - cmake --build .
+- Run compiled executable

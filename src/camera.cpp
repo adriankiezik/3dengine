@@ -1,4 +1,4 @@
-#include "Camera.h"
+#include "camera.h"
 
 Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch, float speed, float sensitivity, float fov)
     : position(position), worldUp(up), yaw(yaw), pitch(pitch), movementSpeed(speed), mouseSensitivity(sensitivity), fov(fov),

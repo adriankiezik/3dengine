@@ -60,7 +60,7 @@ void Editor::renderFPSMenu() {
   oss << currentFps;
   std::string numberStr = oss.str();
   std::string result = "FPS: " + numberStr;
-  ImGui::Text(result.c_str());
+  ImGui::Text("%s", result.c_str());
   ImGui::End();
 }
 
