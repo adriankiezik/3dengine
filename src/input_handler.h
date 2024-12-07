@@ -7,22 +7,26 @@
 #include "camera.h"
 #include "window.h"
 
-class InputHandler {
+class InputHandler
+{
 public:
-    InputHandler(Camera* camera, Window &window);
-    void update();
-    static void initialize();
+  InputHandler(Camera *camera, Window &window);
+  static void init();
+  void update();
 
 private:
-    static Camera* s_camera;
-    static Window* s_window;
-    static float s_lastX;
-    static float s_lastY;
-    static bool s_firstMouse;
-    bool isF1Pressed;
+  static Camera *camera;
+  static Window *window;
+  static float lastX;
+  static float lastY;
+  static bool firstMouse;
+  static bool isF1Pressed;
 
-    static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
-    static void toggleCameraInputHandling();
+  static void mouseCallback(GLFWwindow *window, double xpos, double ypos);
+  static void toggleCameraInputHandling();
+  static bool isF1KeyPressed();
+  static void configureImGuiMouseHandling();
+  static void setupCallbacks();
 };
 
 #endif

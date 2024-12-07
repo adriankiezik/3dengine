@@ -6,14 +6,15 @@
 #include <iostream>
 #include <string>
 
-class Window {
+class Window
+{
 public:
   Window(const std::string &title, int width, int height);
 
-  bool initialize();
-  bool shouldClose() const;
+  bool init();
   void update();
   void postUpdate();
+  bool shouldClose() const;
   void terminate();
 
   GLFWwindow *getWindow() const;
@@ -25,16 +26,16 @@ public:
   ~Window();
 
 private:
-  int m_width;
-  int m_height;
-  const char *m_title;
-  GLFWwindow *m_window;
+  int width;
+  int height;
+  const char *title;
+  GLFWwindow *window;
 
-  int m_renderedFrames;
-  int m_framesPerSecond;
-  float m_lastTime;
-  float m_lastFrame;
-  float m_deltaTime;
+  int renderedFrames;
+  int framesPerSecond;
+  float lastTime;
+  float lastFrame;
+  float deltaTime;
 
   void calculateDeltaTime();
   static void framebufferSizeCallback(GLFWwindow *window, int width,

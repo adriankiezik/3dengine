@@ -2,11 +2,13 @@
 #include <imgui.h>
 
 Window::Window(const std::string &title, int width, int height)
-    : m_width(width), m_height(height), m_title(title.c_str()),
-      m_window(nullptr), m_renderedFrames(0), m_lastTime(0), m_framesPerSecond(0) {}
+    : width(width), height(height), title(title.c_str()),
+      window(nullptr), renderedFrames(0), lastTime(0), framesPerSecond(0) {}
 
-bool Window::initialize() {
-  if (!glfwInit()) {
+bool Window::init()
+{
+  if (!glfwInit())
+  {
     std::cerr << "Failed to initialize GLFW" << std::endl;
 
     return false;
@@ -19,19 +21,21 @@ bool Window::initialize() {
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-  m_window = glfwCreateWindow(m_width, m_height, m_title, nullptr, nullptr);
-  if (!m_window) {
+  window = glfwCreateWindow(width, height, title, nullptr, nullptr);
+  if (!window)
+  {
     std::cerr << "Failed to create GLFW window" << std::endl;
     glfwTerminate();
 
     return false;
   }
 
-  glfwMakeContextCurrent(m_window);
+  glfwMakeContextCurrent(window);
 
-  glfwSetFramebufferSizeCallback(m_window, framebufferSizeCallback);
+  glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+  {
     std::cerr << "Failed to initialize GLAD" << std::endl;
 
     return false;
@@ -42,70 +46,78 @@ bool Window::initialize() {
   return true;
 }
 
-bool Window::shouldClose() const { return glfwWindowShouldClose(m_window); }
+bool Window::shouldClose() const { return glfwWindowShouldClose(window); }
 
-void Window::update() {
+void Window::update()
+{
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   float currentTime = glfwGetTime();
-  m_renderedFrames++;
+  renderedFrames++;
 
   updateMousePosition();
   calculateDeltaTime();
 
-  if (currentTime - m_lastTime >= 1.0f) {
-    m_framesPerSecond = m_renderedFrames;
-    m_renderedFrames = 0;
-    m_lastTime = currentTime;
+  if (currentTime - lastTime >= 1.0f)
+  {
+    framesPerSecond = renderedFrames;
+    renderedFrames = 0;
+    lastTime = currentTime;
   }
 }
 
-void Window::postUpdate() {
-  glfwSwapBuffers(m_window);
+void Window::postUpdate()
+{
+  glfwSwapBuffers(window);
   glfwPollEvents();
 }
 
-void Window::terminate() {
-  if (m_window) {
-    glfwDestroyWindow(m_window);
-    m_window = nullptr;
+void Window::terminate()
+{
+  if (window)
+  {
+    glfwDestroyWindow(window);
+    window = nullptr;
   }
   glfwTerminate();
 }
 
-void Window::calculateDeltaTime() {
-    float currentFrame = glfwGetTime();
-    m_deltaTime = currentFrame - m_lastFrame;
-    m_lastFrame = currentFrame;
+void Window::calculateDeltaTime()
+{
+  float currentFrame = glfwGetTime();
+  deltaTime = currentFrame - lastFrame;
+  lastFrame = currentFrame;
 }
 
-GLFWwindow *Window::getWindow() const { return m_window; }
+GLFWwindow *Window::getWindow() const { return window; }
 
-int Window::getFramesPerSecond() const { return m_framesPerSecond; }
+int Window::getFramesPerSecond() const { return framesPerSecond; }
 
-int Window::getWidth() const { return m_width; }
+int Window::getWidth() const { return width; }
 
-int Window::getHeight() const { return m_height; }
+int Window::getHeight() const { return height; }
 
-float Window::getDeltaTime() const { return m_deltaTime; }
+float Window::getDeltaTime() const { return deltaTime; }
 
 void Window::framebufferSizeCallback(GLFWwindow *window, int width,
-                                     int height) {
+                                     int height)
+{
   glViewport(0, 0, width, height);
 
-  Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
-  if (win) {
-    win->m_width = width;
-    win->m_height = height;
+  Window *win = static_cast<Window *>(glfwGetWindowUserPointer(window));
+  if (win)
+  {
+    win->width = width;
+    win->height = height;
   }
 }
 
 void Window::updateMousePosition()
 {
-    double mouseX, mouseY;
-    glfwGetCursorPos(m_window, &mouseX, &mouseY);
-    ImGuiIO& io = ImGui::GetIO();
-    io.MousePos = ImVec2((float)mouseX, (float)mouseY);
+  double mouseX, mouseY;
+  glfwGetCursorPos(window, &mouseX, &mouseY);
+  ImGuiIO &io = ImGui::GetIO();
+  io.MousePos = ImVec2((float)mouseX, (float)mouseY);
 }
 
 Window::~Window() { terminate(); }

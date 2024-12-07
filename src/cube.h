@@ -5,17 +5,19 @@
 #ifndef CUBE_H
 #define CUBE_H
 
-class Cube {
+class Cube
+{
 public:
   Cube(Camera &camera);
   ~Cube();
 
-  void initialize();
+  void init();
   void update();
+
 private:
-  Shader m_shader;
-  Camera &m_camera;
-  unsigned int m_VBO, m_VAO;
+  Shader shader;
+  Camera &camera;
+  unsigned int VBO, VAO;
 };
 
 #endif

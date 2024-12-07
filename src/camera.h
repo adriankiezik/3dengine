@@ -5,39 +5,58 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
 
-class Camera {
+class Camera
+{
 public:
-    Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch, float speed, float sensitivity, float fov);
+  Camera(glm::vec3 position);
 
-    glm::vec3 position;
-    glm::vec3 front;
-    glm::vec3 up;
-    glm::vec3 right;
-    glm::vec3 worldUp;
+  glm::vec3 getPosition() const;
+  void setPosition(const glm::vec3 &position);
 
-    float yaw;
-    float pitch;
+  float getYaw() const;
+  void setYaw(float yaw);
 
-    float movementSpeed;
-    float mouseSensitivity;
-    float fov;
+  float getPitch() const;
+  void setPitch(float pitch);
 
-    glm::mat4 getViewMatrix() const;
-    glm::mat4 getProjectionMatrix(float aspectRatio) const;
+  float getMovementSpeed() const;
+  void setMovementSpeed(float speed);
 
-    void processKeyboardInput(GLFWwindow *window, float deltaTime);
-    void processMouseInput(float xOffset, float yOffset, bool constrainPitch = true);
+  float getMouseSensitivity() const;
+  void setMouseSensitivity(float sensitivity);
 
-    bool isMouseInputEnabled() const;
-    bool isKeyboardInputEnabled() const;
+  float getFov() const;
+  void setFov(float fov);
 
-    void toggleMouseInput();
-    void toggleKeyboardInput();
+  glm::mat4 getViewMatrix() const;
+  glm::mat4 getProjectionMatrix(float aspectRatio) const;
+
+  void processKeyboardInput(GLFWwindow *window, float deltaTime);
+  void processMouseInput(float xOffset, float yOffset, bool constrainPitch = true);
+
+  bool isMouseInputEnabled() const;
+  bool isKeyboardInputEnabled() const;
+
+  void toggleMouseInput();
+  void toggleKeyboardInput();
+
 private:
-    bool m_mouseInputEnabled;
-    bool m_keyboardInputEnabled;
+  bool mouseInputEnabled;
+  bool keyboardInputEnabled;
 
-    void updateCameraVectors();
+  glm::vec3 position;
+  glm::vec3 front;
+  glm::vec3 up;
+  glm::vec3 right;
+  glm::vec3 worldUp;
+
+  float yaw;
+  float pitch;
+  float movementSpeed;
+  float mouseSensitivity;
+  float fov;
+
+  void updateCameraVectors();
 };
 
 #endif

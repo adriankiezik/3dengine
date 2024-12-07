@@ -1,81 +1,157 @@
 #include "camera.h"
 
-Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch, float speed, float sensitivity, float fov)
-    : position(position), worldUp(up), yaw(yaw), pitch(pitch), movementSpeed(speed), mouseSensitivity(sensitivity), fov(fov),
-    m_mouseInputEnabled(true), m_keyboardInputEnabled(true) {
-    updateCameraVectors();
+Camera::Camera(glm::vec3 position)
+    : position(position),
+      worldUp(glm::vec3(0.0f, 1.0f, 0.0f)),
+      yaw(-90.0f),
+      pitch(0.0f),
+      movementSpeed(2.5f),
+      mouseSensitivity(0.1f),
+      fov(45.0f),
+      mouseInputEnabled(true),
+      keyboardInputEnabled(true)
+{
+  updateCameraVectors();
 }
 
-glm::mat4 Camera::getViewMatrix() const {
-    return glm::lookAt(position, position + front, up);
+glm::mat4 Camera::getViewMatrix() const
+{
+  return glm::lookAt(position, position + front, up);
 }
 
-glm::mat4 Camera::getProjectionMatrix(float aspectRatio) const {
-    return glm::perspective(glm::radians(fov), aspectRatio, 0.1f, 100.0f);
+glm::mat4 Camera::getProjectionMatrix(float aspectRatio) const
+{
+  return glm::perspective(glm::radians(fov), aspectRatio, 0.1f, 100.0f);
 }
 
-void Camera::processKeyboardInput(GLFWwindow *window, float deltaTime) {
-  if (!m_keyboardInputEnabled) {
+void Camera::processKeyboardInput(GLFWwindow *window, float deltaTime)
+{
+  if (!keyboardInputEnabled)
     return;
-  }
 
   float velocity = movementSpeed * deltaTime;
 
-  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) 
-      position += front * velocity;
-  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) 
-      position -= front * velocity;
-  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) 
-      position -= right * velocity;
-  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) 
-      position += right * velocity;
+  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    position += front * velocity;
+  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    position -= front * velocity;
+  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    position -= right * velocity;
+  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    position += right * velocity;
 }
 
-void Camera::processMouseInput(float xOffset, float yOffset, bool constrainPitch) {
-    if (!m_mouseInputEnabled) {
-      return;
-    }
+void Camera::processMouseInput(float xOffset, float yOffset, bool constrainPitch)
+{
+  if (!mouseInputEnabled)
+    return;
 
-    xOffset *= mouseSensitivity;
-    yOffset *= mouseSensitivity;
+  xOffset *= mouseSensitivity;
+  yOffset *= mouseSensitivity;
 
-    yaw += xOffset;
-    pitch += yOffset;
+  yaw += xOffset;
+  pitch += yOffset;
 
-    // Constrain the pitch to prevent screen flipping
-    if (constrainPitch) {
-        if (pitch > 89.0f)
-            pitch = 89.0f;
-        if (pitch < -89.0f)
-            pitch = -89.0f;
-    }
+  if (constrainPitch)
+  {
+    pitch = glm::clamp(pitch, -89.0f, 89.0f);
+  }
 
-    updateCameraVectors();
+  updateCameraVectors();
 }
 
-bool Camera::isMouseInputEnabled() const {
-  return m_mouseInputEnabled;
+bool Camera::isMouseInputEnabled() const
+{
+  return mouseInputEnabled;
 }
 
-bool Camera::isKeyboardInputEnabled() const {
-  return m_keyboardInputEnabled;
+bool Camera::isKeyboardInputEnabled() const
+{
+  return keyboardInputEnabled;
 }
 
-void Camera::toggleMouseInput() {
-  m_mouseInputEnabled = !m_mouseInputEnabled;
+void Camera::toggleMouseInput()
+{
+  mouseInputEnabled = !mouseInputEnabled;
 }
 
-void Camera::toggleKeyboardInput() {
-  m_keyboardInputEnabled = !m_keyboardInputEnabled;
+void Camera::toggleKeyboardInput()
+{
+  keyboardInputEnabled = !keyboardInputEnabled;
 }
 
-void Camera::updateCameraVectors() {
-    glm::vec3 newFront;
-    newFront.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    newFront.y = sin(glm::radians(pitch));
-    newFront.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    front = glm::normalize(newFront);
+void Camera::updateCameraVectors()
+{
+  glm::vec3 newFront;
+  newFront.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+  newFront.y = sin(glm::radians(pitch));
+  newFront.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+  front = glm::normalize(newFront);
 
-    right = glm::normalize(glm::cross(front, worldUp));
-    up = glm::normalize(glm::cross(right, front));
+  right = glm::normalize(glm::cross(front, worldUp));
+  up = glm::normalize(glm::cross(right, front));
+}
+
+// Getters and Setters
+
+glm::vec3 Camera::getPosition() const
+{
+  return position;
+}
+
+void Camera::setPosition(const glm::vec3 &newPosition)
+{
+  position = newPosition;
+}
+
+float Camera::getYaw() const
+{
+  return yaw;
+}
+
+void Camera::setYaw(float newYaw)
+{
+  yaw = newYaw;
+  updateCameraVectors();
+}
+
+float Camera::getPitch() const
+{
+  return pitch;
+}
+
+void Camera::setPitch(float newPitch)
+{
+  pitch = newPitch;
+  updateCameraVectors();
+}
+
+float Camera::getMovementSpeed() const
+{
+  return movementSpeed;
+}
+
+void Camera::setMovementSpeed(float newSpeed)
+{
+  movementSpeed = newSpeed;
+}
+
+float Camera::getMouseSensitivity() const
+{
+  return mouseSensitivity;
+}
+
+void Camera::setMouseSensitivity(float newSensitivity)
+{
+  mouseSensitivity = newSensitivity;
+}
+
+float Camera::getFov() const
+{
+  return fov;
+}
+
+void Camera::setFov(float newFov)
+{
+  fov = newFov;
 }

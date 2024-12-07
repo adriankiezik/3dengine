@@ -6,25 +6,31 @@
 #include "imgui_impl_opengl3.h"
 #include "window.h"
 
-class Editor {
+class Editor
+{
 public:
-  Editor(Window &window);
+  explicit Editor(Window &window);
   ~Editor();
 
-  bool initialize();
+  bool init();
   void update();
 
 private:
-  Window &m_window;
+  Window &window;
 
-  bool m_initialized = false;
-  bool m_wireframe = false;
-  bool m_vsync = true;
+  bool initialized = false;
+  bool wireframe = false;
+  bool vsync = true;
+
+  bool initImGui();
+  void shutdownImGui();
 
   void renderMainMenu();
   void renderFPSMenu();
-  void renderVsyncToggle();
   void renderWireframeToggle();
+  void renderVsyncToggle();
+
+  void toggleWireframeMode();
 };
 
 #endif
