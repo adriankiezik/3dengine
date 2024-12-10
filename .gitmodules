@@ -1,0 +1,3 @@
+[submodule "lib/sol"]
+	path = lib/sol
+	url = git@github.com:ThePhD/sol2.git

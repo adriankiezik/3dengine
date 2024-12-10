@@ -1,33 +1,51 @@
 cmake_minimum_required(VERSION 3.10)
 
-# Project name and C++ standard
 project(3dengine)
 set(CMAKE_CXX_STANDARD 17)
 
-# Add include directories
 include_directories(include)
-include_directories(lib/imgui)  # Add ImGui include directory first
-include_directories(lib/imgui/backends)  # Add ImGui backend directory
+include_directories(lib/imgui)
+include_directories(lib/imgui/backends)
+include_directories(lib/lua/src)
+include_directories(lib/sol/include)
 
-# Add the glad source file
-add_library(glad src/glad.c)
-
-# Find OpenGL and GLFW
 find_package(OpenGL REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
 find_package(assimp REQUIRED)
 
-# Find all .cpp files in the src directory
 file(GLOB SOURCES "src/*.cpp")
-
-# Add ImGui source files
 file(GLOB IMGUI_SOURCES "lib/imgui/*.cpp")
-file(GLOB IMGUI_BACKEND_SOURCES "lib/imgui/backends/*.cpp")  # Add backend files
+file(GLOB IMGUI_BACKEND_SOURCES "lib/imgui/backends/*.cpp")
+file(GLOB LUA_SOURCES "lib/lua/src/*.c")
 
-# Create a single executable (e.g., OpenGLApp)
+add_library(glad src/glad.c)
+add_library(lua STATIC ${LUA_SOURCES})
+
 add_executable(${PROJECT_NAME} ${SOURCES} ${IMGUI_SOURCES} ${IMGUI_BACKEND_SOURCES})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE EDITOR_MODE)
 
-# Link libraries
-target_link_libraries(${PROJECT_NAME} glad glfw assimp::assimp ${OPENGL_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} glad glfw lua assimp::assimp ${OPENGL_LIBRARIES})
+
+if(APPLE)
+    set(APP_BUNDLE_DIR "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.app")
+    set(APP_ICON_PATH "${APP_BUNDLE_DIR}/Contents/Resources/${PROJECT_NAME}.icns")
+
+    file(MAKE_DIRECTORY "${APP_BUNDLE_DIR}/Contents/MacOS")
+    file(MAKE_DIRECTORY "${APP_BUNDLE_DIR}/Contents/Resources")
+
+    # Copy the executable into the MacOS directory
+    set(EXECUTABLE_PATH "${APP_BUNDLE_DIR}/Contents/MacOS/${PROJECT_NAME}")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> ${EXECUTABLE_PATH}
+    )
+
+    # Create the Info.plist file
+    configure_file(resources/Info.plist.in ${APP_BUNDLE_DIR}/Contents/Info.plist @ONLY)
+    # Create icon file
+    configure_file(resources/${PROJECT_NAME}.icns ${APP_ICON_PATH} COPYONLY)
+    
+    message(STATUS "Building for macOS: ${PROJECT_NAME}.app bundle will be created.")
+else()
+    message(STATUS "Not building for macOS: Skipping .app bundle creation.")
+endif()

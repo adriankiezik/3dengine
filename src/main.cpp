@@ -1,10 +1,11 @@
 #include <iostream>
 #include "window.h"
 #include "editor.h"
-#include "input_handler.h"
+#include "input_system.h"
 #include "camera.h"
 #include "model.h"
 #include "scene.h"
+#include <sol/sol.hpp>
 
 int main()
 {
@@ -26,18 +27,18 @@ int main()
     return -1;
   }
 
-  InputHandler inputHandler(&camera, window);
-  inputHandler.init();
+  InputSystem inputSystem(&camera, window);
+  inputSystem.init();
 
-  // Model tableModel("/Users/adriankiezik/3dengine/resources/table/table.obj",
-  //                  "../shaders/vertex_shader.glsl",
-  //                  "../shaders/fragment_shader.glsl");
-
-  // scene.addModel(tableModel);
+  sol::state lua;
+  lua.open_libraries(sol::lib::base);
+  lua.script(R"(
+        print('Hello from Lua!')
+    )");
 
   while (!window.shouldClose())
   {
-    inputHandler.update();
+    inputSystem.update();
     window.update();
     scene.draw();
     editor.update();
