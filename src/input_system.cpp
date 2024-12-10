@@ -9,19 +9,13 @@ float InputSystem::lastY = 300.0f;
 bool InputSystem::firstMouse = true;
 bool InputSystem::isF1Pressed = false;
 
-InputSystem::InputSystem(Camera *camera, Window &window)
+InputSystem::InputSystem(Camera *camera, Window *window)
 {
   this->camera = camera;
-  this->window = &window;
-}
+  this->window = window;
 
-void InputSystem::init()
-{
-  if (window)
-  {
-    setupCallbacks();
-    configureImGuiMouseHandling();
-  }
+  setupCallbacks();
+  configureImGuiMouseHandling();
 }
 
 void InputSystem::update()

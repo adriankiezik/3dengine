@@ -11,7 +11,6 @@ class Window
 public:
   Window(const std::string &title, int width, int height);
 
-  bool init();
   void update();
   void postUpdate();
   bool shouldClose() const;
@@ -37,6 +36,7 @@ private:
   float lastFrame;
   float deltaTime;
 
+  bool init();
   void calculateDeltaTime();
   static void framebufferSizeCallback(GLFWwindow *window, int width,
                                       int height);

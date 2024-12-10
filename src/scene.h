@@ -11,7 +11,7 @@ class Scene
 public:
   Scene(Window &window, Camera &camera);
   void addModel(const Model &model);
-  void draw();
+  void update();
 
 private:
   Window &window;

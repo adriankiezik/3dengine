@@ -3,7 +3,10 @@
 
 Window::Window(const std::string &title, int width, int height)
     : width(width), height(height), title(title.c_str()),
-      window(nullptr), renderedFrames(0), lastTime(0), framesPerSecond(0) {}
+      window(nullptr), renderedFrames(0), lastTime(0), framesPerSecond(0)
+{
+  init();
+}
 
 bool Window::init()
 {

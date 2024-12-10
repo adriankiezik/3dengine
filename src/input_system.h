@@ -10,8 +10,7 @@
 class InputSystem
 {
 public:
-  InputSystem(Camera *camera, Window &window);
-  static void init();
+  InputSystem(Camera *camera, Window *window);
   void update();
 
 private:

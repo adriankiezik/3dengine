@@ -8,7 +8,7 @@ void Scene::addModel(const Model &model)
   models.push_back(model);
 }
 
-void Scene::draw()
+void Scene::update()
 {
   float aspectRatio = window.getWidth() / window.getHeight();
 

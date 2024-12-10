@@ -14,7 +14,6 @@ public:
   explicit Editor(Window &window, Scene &scene);
   ~Editor();
 
-  bool init();
   void update();
 
 private:
@@ -31,6 +30,7 @@ private:
   bool wireframe = false;
   bool vsync = true;
 
+  bool init();
   bool initImGui();
   void shutdownImGui();
 

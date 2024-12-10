@@ -3,7 +3,10 @@
 #include <sstream>
 #include "model.h"
 
-Editor::Editor(Window &window, Scene &scene) : window(window), scene(scene) {}
+Editor::Editor(Window &window, Scene &scene) : window(window), scene(scene)
+{
+  init();
+}
 
 Editor::~Editor()
 {
