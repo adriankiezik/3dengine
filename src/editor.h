@@ -7,11 +7,12 @@
 #include "window.h"
 #include <imfilebrowser.h>
 #include "scene.h"
+#include "script_system.h"
 
 class Editor
 {
 public:
-  explicit Editor(Window &window, Scene &scene);
+  explicit Editor(Window &window, Scene &scene, ScriptSystem &scriptSystem);
   ~Editor();
 
   void update();
@@ -19,6 +20,7 @@ public:
 private:
   Window &window;
   Scene &scene;
+  ScriptSystem &scriptSystem;
 
   ImGui::FileBrowser modelDialog;
   ImGui::FileBrowser diffuseDialog;
@@ -26,16 +28,19 @@ private:
   std::string modelPath;
   std::string diffusePath;
 
+  // Renderer inside window
+  GLuint fbo, texture, rbo;
+
   bool initialized = false;
   bool wireframe = false;
   bool vsync = true;
+  int selectedScriptIndex;
 
   bool init();
   bool initImGui();
   void shutdownImGui();
 
   void renderMainMenu();
-  void renderFPSMenu();
   void renderWireframeToggle();
   void renderVsyncToggle();
 

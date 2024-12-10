@@ -8,6 +8,7 @@
 class Camera
 {
 public:
+  Camera();
   Camera(glm::vec3 position);
 
   glm::vec3 getPosition() const;

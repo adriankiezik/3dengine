@@ -2,8 +2,10 @@
 #include <iostream>
 #include <sstream>
 #include "model.h"
+#include "script_system.h"
 
-Editor::Editor(Window &window, Scene &scene) : window(window), scene(scene)
+Editor::Editor(Window &window, Scene &scene, ScriptSystem &scriptSystem)
+    : window(window), scene(scene), scriptSystem(scriptSystem), selectedScriptIndex(-1)
 {
   init();
 }
@@ -51,7 +53,6 @@ void Editor::update()
   ImGui::NewFrame();
 
   renderMainMenu();
-  renderFPSMenu();
 
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -63,7 +64,7 @@ void Editor::renderMainMenu()
   ImGui::SetNextWindowCollapsed(true, ImGuiCond_Once);
   ImGui::Begin("3dengine");
 
-  if (ImGui::CollapsingHeader("Add model"))
+  if (ImGui::CollapsingHeader("Objects"))
   {
     ImGui::Text("Model:");
     ImGui::SameLine();
@@ -76,6 +77,7 @@ void Editor::renderMainMenu()
       modelDialog.Open();
     }
     ImGui::PopID();
+
     ImGui::Text("Diffuse texture:");
     ImGui::SameLine();
     ImGui::PushID(2);
@@ -109,6 +111,40 @@ void Editor::renderMainMenu()
     }
   }
 
+  if (ImGui::CollapsingHeader("Scripts"))
+  {
+    std::vector<Script> scripts = scriptSystem.getScripts();
+
+    ImGui::PushID(3);
+
+    if (scripts.size() != 0 && ImGui::BeginListBox("", ImVec2(ImGui::GetWindowWidth(), ImGui::GetTextLineHeightWithSpacing() * scripts.size())))
+    {
+      for (int i = 0; i < scripts.size(); i++)
+      {
+        if (ImGui::Selectable(scripts[i].name.c_str(), selectedScriptIndex == i))
+        {
+          selectedScriptIndex = i;
+        }
+      }
+      ImGui::EndListBox();
+    }
+
+    ImGui::PopID();
+
+    if (selectedScriptIndex >= 0 && selectedScriptIndex < scripts.size())
+    {
+    }
+  }
+
+  if (ImGui::CollapsingHeader("Diagnostics"))
+  {
+    int currentFps = window.getFramesPerSecond();
+    std::ostringstream oss;
+    oss << currentFps;
+    std::string fpsText = "FPS: " + oss.str();
+    ImGui::Text("%s", fpsText.c_str());
+  }
+
   if (ImGui::CollapsingHeader("Settings"))
   {
     renderWireframeToggle();
@@ -131,23 +167,6 @@ void Editor::renderMainMenu()
     diffusePath = diffuseDialog.GetSelected().string();
     diffuseDialog.ClearSelected();
   }
-}
-
-void Editor::renderFPSMenu()
-{
-  ImGui::SetNextWindowPos(ImVec2(window.getWidth() - 150, 25), ImGuiCond_Once);
-  ImGui::SetNextWindowCollapsed(false, ImGuiCond_Once);
-  ImGui::SetNextWindowSize(ImVec2(125, 50));
-
-  ImGui::Begin("FPS Counter");
-
-  int currentFps = window.getFramesPerSecond();
-  std::ostringstream oss;
-  oss << currentFps;
-  std::string fpsText = "FPS: " + oss.str();
-  ImGui::Text("%s", fpsText.c_str());
-
-  ImGui::End();
 }
 
 void Editor::renderWireframeToggle()
