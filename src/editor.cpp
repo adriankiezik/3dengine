@@ -3,9 +3,10 @@
 #include <sstream>
 #include "model.h"
 #include "script_system.h"
+#include "camera.h"
 
-Editor::Editor(Window &window, Scene &scene, ScriptSystem &scriptSystem, Framebuffer &framebuffer)
-    : window(window), scene(scene), scriptSystem(scriptSystem), selectedScriptIndex(-1), framebuffer(framebuffer)
+Editor::Editor(Window &window, Scene &scene, Camera &camera, ScriptSystem &scriptSystem, Framebuffer &framebuffer)
+    : window(window), scene(scene), camera(camera), scriptSystem(scriptSystem), selectedScriptIndex(-1), framebuffer(framebuffer)
 {
   init();
 }
@@ -52,28 +53,25 @@ void Editor::update()
   ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();
 
-  ImGui::Begin("My Scene");
-
-  // we access the ImGui window size
+  ImGui::Begin("Renderer");
   const float window_width = ImGui::GetContentRegionAvail().x;
   const float window_height = ImGui::GetContentRegionAvail().y;
+  if (window_height != renderer_size.y || window_width != renderer_size.x)
+  {
+    renderer_size.x = window_width;
+    renderer_size.y = window_height;
 
-  // we rescale the framebuffer to the actual window size here and reset the glViewport
-  framebuffer.rescale(window_width, window_height);
-  glViewport(0, 0, window_width, window_height);
-
-  // we get the screen position of the window
+    camera.setAspectRatio(static_cast<float>(window_width / window_height));
+    framebuffer.rescale(window_width, window_height);
+    glViewport(0, 0, window_width, window_height);
+  }
   ImVec2 pos = ImGui::GetCursorScreenPos();
-
-  // and here we can add our created texture as image to ImGui
-  // unfortunately we need to use the cast to void* or I didn't find another way tbh
   ImGui::GetWindowDrawList()->AddImage(
-      (ImTextureID)(uintptr_t)framebuffer.getTextureId(), // Correct type cast
+      (ImTextureID)(uintptr_t)framebuffer.getTextureId(),
       ImVec2(pos.x, pos.y),
       ImVec2(pos.x + window_width, pos.y + window_height),
       ImVec2(0, 1),
       ImVec2(1, 0));
-
   ImGui::End();
 
   renderMainMenu();

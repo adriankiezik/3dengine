@@ -1,5 +1,6 @@
 #include "window.h"
 #include <imgui.h>
+#include "framebuffer.h"
 
 Window::Window(const std::string &title, int width, int height)
     : width(width), height(height), title(title.c_str()),
@@ -48,6 +49,8 @@ bool Window::init()
 
   glEnable(GL_DEPTH_TEST);
 
+  framebuffer.init();
+
   return true;
 }
 
@@ -56,6 +59,7 @@ bool Window::shouldClose() const { return glfwWindowShouldClose(window); }
 void Window::update()
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
   float currentTime = glfwGetTime();
   renderedFrames++;
@@ -103,6 +107,11 @@ int Window::getWidth() const { return width; }
 int Window::getHeight() const { return height; }
 
 float Window::getDeltaTime() const { return deltaTime; }
+
+Framebuffer &Window::getFramebuffer()
+{
+  return framebuffer;
+}
 
 void Window::framebufferSizeCallback(GLFWwindow *window, int width,
                                      int height)

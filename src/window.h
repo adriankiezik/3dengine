@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <string>
+#include "framebuffer.h"
 
 class Window
 {
@@ -17,6 +18,7 @@ public:
   void terminate();
 
   GLFWwindow *getWindow() const;
+  Framebuffer &getFramebuffer();
   int getWidth() const;
   int getHeight() const;
   int getFramesPerSecond() const;
@@ -28,7 +30,9 @@ private:
   int width;
   int height;
   const char *title;
+
   GLFWwindow *window;
+  Framebuffer framebuffer;
 
   int renderedFrames;
   int framesPerSecond;

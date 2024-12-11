@@ -9,11 +9,12 @@
 #include "scene.h"
 #include "script_system.h"
 #include "framebuffer.h"
+#include "camera.h"
 
 class Editor
 {
 public:
-  explicit Editor(Window &window, Scene &scene, ScriptSystem &scriptSystem, Framebuffer &framebuffer);
+  explicit Editor(Window &window, Scene &scene, Camera &camera, ScriptSystem &scriptSystem, Framebuffer &framebuffer);
   ~Editor();
 
   void update();
@@ -21,8 +22,12 @@ public:
 private:
   Window &window;
   Scene &scene;
+  Camera &camera;
   ScriptSystem &scriptSystem;
+
+  GLuint fbo, texture, rbo;
   Framebuffer &framebuffer;
+  ImVec2 renderer_size;
 
   ImGui::FileBrowser modelDialog;
   ImGui::FileBrowser diffuseDialog;
@@ -30,12 +35,10 @@ private:
   std::string modelPath;
   std::string diffusePath;
 
-  // Renderer inside window
-  GLuint fbo, texture, rbo;
-
   bool initialized = false;
   bool wireframe = false;
   bool vsync = true;
+
   int selectedScriptIndex;
 
   bool init();

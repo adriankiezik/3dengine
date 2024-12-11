@@ -6,11 +6,12 @@
 class Framebuffer
 {
 public:
-  Framebuffer(int width, int height);
+  void init();
 
   void bind();
   void unbind();
   void rescale(int width, int height);
+
   GLuint getTextureId();
 
 private:

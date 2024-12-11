@@ -26,7 +26,6 @@ private:
   ScriptSystem scriptSystem;
   Editor editor;
   InputSystem inputSystem;
-  Framebuffer framebuffer;
 };
 
 #endif

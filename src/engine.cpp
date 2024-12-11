@@ -4,10 +4,9 @@
 Engine::Engine(const std::string &title, int width, int height)
     : window(title, width, height),
       camera(),
-      scene(camera),
+      scene(camera, window.getFramebuffer()),
       inputSystem(&camera, &window),
-      framebuffer(800, 600),
-      editor(window, scene, scriptSystem, framebuffer) {}
+      editor(window, scene, camera, scriptSystem, window.getFramebuffer()) {}
 
 void Engine::run()
 {
@@ -33,10 +32,7 @@ void Engine::update()
   inputSystem.update();
   scriptSystem.update();
   editor.update();
-  framebuffer.bind();
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   scene.update();
-  framebuffer.unbind();
 }
 
 void Engine::postUpdate()
