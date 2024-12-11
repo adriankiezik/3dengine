@@ -8,11 +8,12 @@
 #include <imfilebrowser.h>
 #include "scene.h"
 #include "script_system.h"
+#include "framebuffer.h"
 
 class Editor
 {
 public:
-  explicit Editor(Window &window, Scene &scene, ScriptSystem &scriptSystem);
+  explicit Editor(Window &window, Scene &scene, ScriptSystem &scriptSystem, Framebuffer &framebuffer);
   ~Editor();
 
   void update();
@@ -21,6 +22,7 @@ private:
   Window &window;
   Scene &scene;
   ScriptSystem &scriptSystem;
+  Framebuffer &framebuffer;
 
   ImGui::FileBrowser modelDialog;
   ImGui::FileBrowser diffuseDialog;

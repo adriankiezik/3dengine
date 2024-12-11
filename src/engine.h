@@ -8,6 +8,7 @@
 #include "script_system.h"
 #include "camera.h"
 #include "scene.h"
+#include "framebuffer.h"
 
 class Engine
 {
@@ -25,6 +26,7 @@ private:
   ScriptSystem scriptSystem;
   Editor editor;
   InputSystem inputSystem;
+  Framebuffer framebuffer;
 };
 
 #endif
