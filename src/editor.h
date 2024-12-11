@@ -14,6 +14,17 @@
 #include <string>
 #include <vector>
 
+struct ImVec3
+{
+  float x, y, z;
+  ImVec3(float _x = 0.0f, float _y = 0.0f, float _z = 0.0f)
+  {
+    x = _x;
+    y = _y;
+    z = _z;
+  }
+};
+
 class Editor
 {
 public:
@@ -41,6 +52,11 @@ private:
   bool vsync = true;
   int selectedScriptIndex = -1;
 
+  bool showConsole;
+  bool showScripts;
+  bool showHierarchy;
+  bool showDiagnostics;
+
   bool init();
   bool initImGui();
   void shutdownImGui();
@@ -53,6 +69,11 @@ private:
   void renderViewport();
   void renderMainMenu();
   void renderMenuBar();
+
+  void renderConsole();
+  void renderScripts();
+  void renderHierarchy();
+  void renderDiagnostics();
 
   void renderObjectsMenu();
   void renderScriptsMenu();
@@ -68,6 +89,13 @@ private:
   void renderWireframeToggle();
   void toggleWireframeMode();
   void renderVsyncToggle();
+
+  void openBrowser(const char *url);
+
+  void setupImGuiStyle();
+  void styleImGuiComponents(
+      ImVec3 color_for_text, ImVec3 color_for_head,
+      ImVec3 color_for_area, ImVec3 color_for_body, ImVec3 color_for_pops);
 };
 
 #endif

@@ -59,7 +59,7 @@ bool Window::shouldClose() const { return glfwWindowShouldClose(window); }
 void Window::update()
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  glClearColor(0.678f, 0.847f, 1.0f, 1.0f);
 
   float currentTime = glfwGetTime();
   renderedFrames++;

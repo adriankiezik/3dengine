@@ -30,7 +30,7 @@ void Framebuffer::bind()
 {
   glBindFramebuffer(GL_FRAMEBUFFER, FBO);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+  glClearColor(0.12f, 0.12f, 0.12f, 1.0f);
 }
 
 void Framebuffer::unbind()
