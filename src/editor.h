@@ -10,6 +10,9 @@
 #include "script_system.h"
 #include "framebuffer.h"
 #include "camera.h"
+#include <functional>
+#include <string>
+#include <vector>
 
 class Editor
 {
@@ -24,32 +27,44 @@ private:
   Scene &scene;
   Camera &camera;
   ScriptSystem &scriptSystem;
-
-  GLuint fbo, texture, rbo;
   Framebuffer &framebuffer;
+
   ImVec2 renderer_size;
+  bool initialized = false;
 
   ImGui::FileBrowser modelDialog;
   ImGui::FileBrowser diffuseDialog;
-
   std::string modelPath;
   std::string diffusePath;
 
-  bool initialized = false;
   bool wireframe = false;
   bool vsync = true;
-
-  int selectedScriptIndex;
+  int selectedScriptIndex = -1;
 
   bool init();
   bool initImGui();
   void shutdownImGui();
 
+  void startFrame();
+  void endFrame();
+  void renderEditorUI();
+  void renderViewport();
   void renderMainMenu();
-  void renderWireframeToggle();
-  void renderVsyncToggle();
 
+  void renderObjectsMenu();
+  void renderScriptsMenu();
+  void renderDiagnosticsMenu();
+  void renderSettingsMenu();
+
+  void adjustViewportSize();
+  void renderFileSelector(const char *label, std::string &path, ImGui::FileBrowser &dialog, const std::vector<std::string> &filters);
+  void renderCenteredButton(const char *label, std::function<void()> onClick);
+  void handleDialogSelections();
+  void addModelToScene();
+
+  void renderWireframeToggle();
   void toggleWireframeMode();
+  void renderVsyncToggle();
 };
 
 #endif

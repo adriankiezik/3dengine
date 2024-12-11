@@ -6,7 +6,7 @@
 #include "camera.h"
 
 Editor::Editor(Window &window, Scene &scene, Camera &camera, ScriptSystem &scriptSystem, Framebuffer &framebuffer)
-    : window(window), scene(scene), camera(camera), scriptSystem(scriptSystem), selectedScriptIndex(-1), framebuffer(framebuffer)
+    : window(window), scene(scene), camera(camera), scriptSystem(scriptSystem), framebuffer(framebuffer), selectedScriptIndex(-1)
 {
   init();
 }
@@ -16,7 +16,6 @@ Editor::~Editor()
   if (initialized)
   {
     shutdownImGui();
-    initialized = false;
   }
 }
 
@@ -29,8 +28,6 @@ bool Editor::initImGui()
 {
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
-  ImGuiIO &io = ImGui::GetIO();
-
   ImGui::StyleColorsDark();
 
   ImGui_ImplGlfw_InitForOpenGL(window.getWindow(), true);
@@ -45,39 +42,67 @@ void Editor::shutdownImGui()
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
   ImGui::DestroyContext();
+  initialized = false;
 }
 
 void Editor::update()
 {
+  startFrame();
+  renderEditorUI();
+  endFrame();
+}
+
+void Editor::startFrame()
+{
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();
+}
 
+void Editor::endFrame()
+{
+  ImGui::Render();
+  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void Editor::renderEditorUI()
+{
+  renderViewport();
+  renderMainMenu();
+}
+
+void Editor::renderViewport()
+{
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
   ImGui::Begin("Renderer");
-  const float window_width = ImGui::GetContentRegionAvail().x;
-  const float window_height = ImGui::GetContentRegionAvail().y;
-  if (window_height != renderer_size.y || window_width != renderer_size.x)
-  {
-    renderer_size.x = window_width;
-    renderer_size.y = window_height;
 
-    camera.setAspectRatio(static_cast<float>(window_width / window_height));
-    framebuffer.rescale(window_width, window_height);
-    glViewport(0, 0, window_width, window_height);
-  }
+  adjustViewportSize();
+
   ImVec2 pos = ImGui::GetCursorScreenPos();
   ImGui::GetWindowDrawList()->AddImage(
       (ImTextureID)(uintptr_t)framebuffer.getTextureId(),
       ImVec2(pos.x, pos.y),
-      ImVec2(pos.x + window_width, pos.y + window_height),
+      ImVec2(pos.x + renderer_size.x, pos.y + renderer_size.y),
       ImVec2(0, 1),
       ImVec2(1, 0));
+
   ImGui::End();
+  ImGui::PopStyleVar();
+}
 
-  renderMainMenu();
+void Editor::adjustViewportSize()
+{
+  const float window_width = ImGui::GetContentRegionAvail().x;
+  const float window_height = ImGui::GetContentRegionAvail().y;
 
-  ImGui::Render();
-  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+  if (window_width != renderer_size.x || window_height != renderer_size.y)
+  {
+    renderer_size = ImVec2(window_width, window_height);
+    window.getFramebuffer().rescale(window_width, window_height);
+    camera.setAspectRatio(static_cast<float>(window_width / window_height));
+  }
+
+  glViewport(0, 0, window_width, window_height);
 }
 
 void Editor::renderMainMenu()
@@ -86,98 +111,111 @@ void Editor::renderMainMenu()
   ImGui::SetNextWindowCollapsed(true, ImGuiCond_Once);
   ImGui::Begin("3dengine");
 
-  if (ImGui::CollapsingHeader("Objects"))
-  {
-    ImGui::Text("Model:");
-    ImGui::SameLine();
-    ImGui::PushID(1);
-    const char *modelLabel = modelPath.empty() ? "None" : modelPath.c_str();
-    if (ImGui::Button(modelLabel))
-    {
-      modelDialog.SetTitle("Select model (.obj / .fbx)");
-      modelDialog.SetTypeFilters({".obj", ".fbx"});
-      modelDialog.Open();
-    }
-    ImGui::PopID();
-
-    ImGui::Text("Diffuse texture:");
-    ImGui::SameLine();
-    ImGui::PushID(2);
-    const char *diffuseLabel = diffusePath.empty() ? "None" : diffusePath.c_str();
-    if (ImGui::Button(diffuseLabel))
-    {
-      diffuseDialog.SetTitle("Select diffuse texture (.png / .jpg)");
-      diffuseDialog.SetTypeFilters({".png", ".jpg"});
-      diffuseDialog.Open();
-    }
-    ImGui::PopID();
-
-    ImGui::Spacing();
-
-    float window_width = ImGui::GetWindowWidth();
-    float button_width = 100.0f;
-    float x_center = (window_width - button_width) * 0.5f;
-
-    ImGui::SetCursorPosX(x_center);
-
-    if (ImGui::Button("Add to scene"))
-    {
-      std::vector<std::pair<std::string, std::string>> texturePaths = {
-          {"texture_diffuse", diffusePath}};
-
-      Model newModel(modelPath, texturePaths, "../shaders/vertex_shader.glsl", "../shaders/fragment_shader.glsl");
-      scene.addModel(newModel);
-
-      modelPath = "";
-      diffusePath = "";
-    }
-  }
-
-  if (ImGui::CollapsingHeader("Scripts"))
-  {
-    std::vector<Script> scripts = scriptSystem.getScripts();
-
-    ImGui::PushID(3);
-
-    if (scripts.size() != 0 && ImGui::BeginListBox("", ImVec2(ImGui::GetWindowWidth(), ImGui::GetTextLineHeightWithSpacing() * scripts.size())))
-    {
-      for (int i = 0; i < scripts.size(); i++)
-      {
-        if (ImGui::Selectable(scripts[i].name.c_str(), selectedScriptIndex == i))
-        {
-          selectedScriptIndex = i;
-        }
-      }
-      ImGui::EndListBox();
-    }
-
-    ImGui::PopID();
-
-    if (selectedScriptIndex >= 0 && selectedScriptIndex < scripts.size())
-    {
-    }
-  }
-
-  if (ImGui::CollapsingHeader("Diagnostics"))
-  {
-    int currentFps = window.getFramesPerSecond();
-    std::ostringstream oss;
-    oss << currentFps;
-    std::string fpsText = "FPS: " + oss.str();
-    ImGui::Text("%s", fpsText.c_str());
-  }
-
-  if (ImGui::CollapsingHeader("Settings"))
-  {
-    renderWireframeToggle();
-    renderVsyncToggle();
-  }
+  renderObjectsMenu();
+  renderScriptsMenu();
+  renderDiagnosticsMenu();
+  renderSettingsMenu();
 
   ImGui::End();
 
-  modelDialog.Display();
-  diffuseDialog.Display();
+  handleDialogSelections();
+}
 
+void Editor::renderObjectsMenu()
+{
+  if (!ImGui::CollapsingHeader("Objects"))
+    return;
+
+  renderFileSelector("Model", modelPath, modelDialog, {".obj", ".fbx"});
+  renderFileSelector("Diffuse texture", diffusePath, diffuseDialog, {".png", ".jpg"});
+
+  ImGui::Spacing();
+  renderCenteredButton("Add to scene", [&]()
+                       { addModelToScene(); });
+}
+
+void Editor::renderFileSelector(const char *label, std::string &path, ImGui::FileBrowser &dialog, const std::vector<std::string> &filters)
+{
+  ImGui::Text("%s:", label);
+  ImGui::SameLine();
+  ImGui::PushID(label);
+
+  const char *labelText = path.empty() ? "None" : path.c_str();
+  if (ImGui::Button(labelText))
+  {
+    dialog.SetTitle(std::string("Select ") + label);
+    dialog.SetTypeFilters(filters);
+    dialog.Open();
+  }
+
+  ImGui::PopID();
+}
+
+void Editor::renderCenteredButton(const char *label, std::function<void()> onClick)
+{
+  float window_width = ImGui::GetWindowWidth();
+  float button_width = 100.0f;
+  float x_center = (window_width - button_width) * 0.5f;
+
+  ImGui::SetCursorPosX(x_center);
+  if (ImGui::Button(label))
+  {
+    onClick();
+  }
+}
+
+void Editor::addModelToScene()
+{
+  std::vector<std::pair<std::string, std::string>> texturePaths = {{"texture_diffuse", diffusePath}};
+  Model newModel(modelPath, texturePaths, "../shaders/vertex_shader.glsl", "../shaders/fragment_shader.glsl");
+  scene.addModel(newModel);
+
+  modelPath.clear();
+  diffusePath.clear();
+}
+
+void Editor::renderScriptsMenu()
+{
+  if (!ImGui::CollapsingHeader("Scripts"))
+    return;
+
+  auto scripts = scriptSystem.getScripts();
+
+  ImGui::PushID("ScriptsList");
+  if (!scripts.empty() && ImGui::BeginListBox("", ImVec2(ImGui::GetWindowWidth(), ImGui::GetTextLineHeightWithSpacing() * scripts.size())))
+  {
+    for (int i = 0; i < scripts.size(); i++)
+    {
+      if (ImGui::Selectable(scripts[i].name.c_str(), selectedScriptIndex == i))
+      {
+        selectedScriptIndex = i;
+      }
+    }
+    ImGui::EndListBox();
+  }
+  ImGui::PopID();
+}
+
+void Editor::renderDiagnosticsMenu()
+{
+  if (!ImGui::CollapsingHeader("Diagnostics"))
+    return;
+
+  int currentFps = window.getFramesPerSecond();
+  ImGui::Text("FPS: %d", currentFps);
+}
+
+void Editor::renderSettingsMenu()
+{
+  if (!ImGui::CollapsingHeader("Settings"))
+    return;
+
+  renderWireframeToggle();
+  renderVsyncToggle();
+}
+
+void Editor::handleDialogSelections()
+{
   if (modelDialog.HasSelected())
   {
     modelPath = modelDialog.GetSelected().string();
@@ -193,8 +231,8 @@ void Editor::renderMainMenu()
 
 void Editor::renderWireframeToggle()
 {
-  toggleWireframeMode();
   ImGui::Checkbox("Wireframe", &wireframe);
+  toggleWireframeMode();
 }
 
 void Editor::toggleWireframeMode()
@@ -204,6 +242,6 @@ void Editor::toggleWireframeMode()
 
 void Editor::renderVsyncToggle()
 {
-  glfwSwapInterval(vsync ? 1 : 0);
   ImGui::Checkbox("Vertical Sync", &vsync);
+  glfwSwapInterval(vsync ? 1 : 0);
 }

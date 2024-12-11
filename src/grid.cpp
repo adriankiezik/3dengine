@@ -20,10 +20,8 @@ void Grid::render(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4
   shader.setMat4("projection", projection);
   shader.setUniform3f("color", color.x, color.y, color.z);
 
-  // Dynamically generate vertices within the render radius
   generateVertices(cameraPosition, renderRadius);
 
-  // Update buffer data
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
 
@@ -34,7 +32,7 @@ void Grid::render(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4
 
 void Grid::generateVertices(const glm::vec3 &cameraPosition, float renderRadius)
 {
-  vertices.clear(); // Clear previous vertices
+  vertices.clear();
 
   int halfLines = static_cast<int>(renderRadius / spacing);
   float startX = std::floor(cameraPosition.x / spacing) * spacing;
@@ -45,7 +43,6 @@ void Grid::generateVertices(const glm::vec3 &cameraPosition, float renderRadius)
     float offsetX = startX + i * spacing;
     float offsetZ = startZ + i * spacing;
 
-    // Horizontal lines
     vertices.push_back(offsetX);
     vertices.push_back(0.0f);
     vertices.push_back(startZ - halfLines * spacing);
@@ -53,7 +50,6 @@ void Grid::generateVertices(const glm::vec3 &cameraPosition, float renderRadius)
     vertices.push_back(0.0f);
     vertices.push_back(startZ + halfLines * spacing);
 
-    // Vertical lines
     vertices.push_back(startX - halfLines * spacing);
     vertices.push_back(0.0f);
     vertices.push_back(offsetZ);
@@ -71,7 +67,7 @@ void Grid::setup()
   glBindVertexArray(VAO);
 
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_DYNAMIC_DRAW); // Dynamic draw for frequently updated buffer
+  glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_DYNAMIC_DRAW);
 
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);

@@ -10,7 +10,7 @@ public:
 
   void bind();
   void unbind();
-  void rescale(int width, int height);
+  void rescale(float width, float height);
 
   GLuint getTextureId();
 

@@ -1,5 +1,4 @@
 #include "engine.h"
-#include "framebuffer.h"
 
 Engine::Engine(const std::string &title, int width, int height)
     : window(title, width, height),
@@ -10,14 +9,10 @@ Engine::Engine(const std::string &title, int width, int height)
 
 void Engine::run()
 {
-  scriptSystem.addScript("/Users/adriankiezik/3dengine/src/engine.cpp");
   std::vector<std::pair<std::string, std::string>> texturePaths = {
       {"texture_diffuse", "../resources/gitignored/table/DefaultMaterial_BaseColor.png"}};
   Model model("../resources/gitignored/table/Table.obj", texturePaths, "../shaders/vertex_shader.glsl", "../shaders/fragment_shader.glsl");
-
   scene.addModel(model);
-
-  camera.setAspectRatio(static_cast<float>(800 / 600));
 
   while (!window.shouldClose())
   {
