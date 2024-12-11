@@ -10,7 +10,7 @@ void Scene::addModel(const Model &model)
 
 void Scene::update()
 {
-  float aspectRatio = window.getWidth() / window.getHeight();
+  float aspectRatio = static_cast<float>(window.getWidth()) / window.getHeight();
 
   for (Model &model : models)
   {

@@ -35,6 +35,8 @@ bool Window::init()
 
   glfwMakeContextCurrent(window);
 
+  glfwSetWindowUserPointer(window, this);
+
   glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
