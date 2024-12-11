@@ -47,9 +47,12 @@ private:
 
   void startFrame();
   void endFrame();
+
   void renderEditorUI();
+
   void renderViewport();
   void renderMainMenu();
+  void renderMenuBar();
 
   void renderObjectsMenu();
   void renderScriptsMenu();

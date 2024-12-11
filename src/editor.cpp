@@ -68,7 +68,66 @@ void Editor::endFrame()
 void Editor::renderEditorUI()
 {
   renderViewport();
-  renderMainMenu();
+  renderMenuBar();
+  // renderMainMenu();
+}
+
+void Editor::renderMenuBar()
+{
+  if (ImGui::BeginMainMenuBar())
+  {
+    if (ImGui::BeginMenu("File"))
+    {
+      if (ImGui::MenuItem("New"))
+      {
+      }
+      if (ImGui::MenuItem("Save"))
+      {
+      }
+      if (ImGui::MenuItem("Settings"))
+      {
+      }
+      if (ImGui::MenuItem("Exit"))
+      {
+      }
+      ImGui::EndMenu();
+    }
+    if (ImGui::BeginMenu("Edit"))
+    {
+      if (ImGui::MenuItem("Add Script"))
+      {
+      }
+      if (ImGui::MenuItem("Add Object"))
+      {
+      }
+      ImGui::EndMenu();
+    }
+    if (ImGui::BeginMenu("Windows"))
+    {
+      if (ImGui::MenuItem("Console"))
+      {
+      }
+      if (ImGui::MenuItem("Hierarchy"))
+      {
+      }
+      if (ImGui::MenuItem("Diagnostics"))
+      {
+      }
+      ImGui::EndMenu();
+    }
+    if (ImGui::BeginMenu("Help"))
+    {
+      if (ImGui::MenuItem("Documentation"))
+      {
+      }
+      if (ImGui::MenuItem("Github"))
+      {
+      }
+      ImGui::EndMenu();
+    }
+
+    ImGui::EndMainMenuBar();
+  }
 }
 
 void Editor::renderViewport()
