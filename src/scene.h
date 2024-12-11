@@ -9,12 +9,11 @@
 class Scene
 {
 public:
-  Scene(Window &window, Camera &camera);
+  Scene(Camera &camera);
   void addModel(const Model &model);
   void update();
 
 private:
-  Window &window;
   Camera &camera;
   std::vector<Model> models;
 };

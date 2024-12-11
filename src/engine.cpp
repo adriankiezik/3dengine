@@ -3,7 +3,7 @@
 Engine::Engine(const std::string &title, int width, int height)
     : window(title, width, height),
       camera(),
-      scene(window, camera),
+      scene(camera),
       inputSystem(&camera, &window),
       editor(window, scene, scriptSystem) {}
 
@@ -15,6 +15,8 @@ void Engine::run()
   Model model("../resources/gitignored/table/Table.obj", texturePaths, "../shaders/vertex_shader.glsl", "../shaders/fragment_shader.glsl");
 
   scene.addModel(model);
+
+  camera.setAspectRatio(static_cast<float>(window.getWidth()) / window.getHeight());
 
   while (!window.shouldClose())
   {

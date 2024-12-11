@@ -29,8 +29,11 @@ public:
   float getFov() const;
   void setFov(float fov);
 
+  float getAspectRatio() const;
+  void setAspectRatio(float aspectRatio);
+
   glm::mat4 getViewMatrix() const;
-  glm::mat4 getProjectionMatrix(float aspectRatio) const;
+  glm::mat4 getProjectionMatrix() const;
 
   void processKeyboardInput(GLFWwindow *window, float deltaTime);
   void processMouseInput(float xOffset, float yOffset, bool constrainPitch = true);
@@ -56,6 +59,7 @@ private:
   float movementSpeed;
   float mouseSensitivity;
   float fov;
+  float aspectRatio;
 
   void updateCameraVectors();
 };

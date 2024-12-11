@@ -14,28 +14,13 @@ Camera::Camera()
   updateCameraVectors();
 }
 
-Camera::Camera(glm::vec3 position)
-    : position(position),
-      worldUp(glm::vec3(0.0f, 1.0f, 0.0f)),
-      yaw(-90.0f),
-      pitch(0.0f),
-      movementSpeed(2.5f),
-      mouseSensitivity(0.1f),
-      fov(65.0f),
-      mouseInputEnabled(true),
-      keyboardInputEnabled(true)
-{
-  updateCameraVectors();
-}
-
 glm::mat4 Camera::getViewMatrix() const
 {
   return glm::lookAt(position, position + front, up);
 }
 
-glm::mat4 Camera::getProjectionMatrix(float aspectRatio) const
+glm::mat4 Camera::getProjectionMatrix() const
 {
-  // Far is 1000.0f for now (should be changed later for performance)
   return glm::perspective(glm::radians(fov), aspectRatio, 0.01f, 1000.0f);
 }
 
@@ -107,8 +92,6 @@ void Camera::updateCameraVectors()
   up = glm::normalize(glm::cross(right, front));
 }
 
-// Getters and Setters
-
 glm::vec3 Camera::getPosition() const
 {
   return position;
@@ -169,4 +152,14 @@ float Camera::getFov() const
 void Camera::setFov(float newFov)
 {
   fov = newFov;
+}
+
+float Camera::getAspectRatio() const
+{
+  return aspectRatio;
+}
+
+void Camera::setAspectRatio(float newAspectRatio)
+{
+  aspectRatio = newAspectRatio;
 }
