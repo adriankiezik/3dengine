@@ -15,11 +15,15 @@ Model::Model(const std::string &modelPath,
   loadModel(modelPath, texturePaths);
 }
 
-void Model::Draw(const glm::mat4 &view, const glm::mat4 &projection)
+void Model::Draw(const glm::vec3 &position, const glm::mat4 &view, const glm::mat4 &projection)
 {
   shader.use();
   shader.setMat4("view", view);
   shader.setMat4("projection", projection);
+
+  shader.setUniform3f("lightDirection", 1.0f, -1.0f, -1.0f); // Sunlight direction
+  shader.setUniform3f("lightColor", 1.0f, 1.0f, 1.0f);       // White sunlight
+  shader.setUniform3f("viewPosition", position.x, position.y, position.z);
 
   for (Mesh &mesh : meshes)
   {

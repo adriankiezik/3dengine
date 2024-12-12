@@ -20,7 +20,7 @@ void Scene::update()
 
   for (Model &model : models)
   {
-    model.Draw(camera.getViewMatrix(), camera.getProjectionMatrix());
+    model.Draw(camera.getPosition(), camera.getViewMatrix(), camera.getProjectionMatrix());
   }
 
   framebuffer.unbind();

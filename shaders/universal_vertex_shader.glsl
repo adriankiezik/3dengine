@@ -9,9 +9,12 @@ uniform mat4 projection;
 
 out vec3 fragNormal;
 out vec2 fragTexCoords;
+out vec3 fragPosition;
 
 void main() {
-    fragNormal = normal;
+    vec4 worldPosition = model * vec4(position, 1.0); // World-space position
+    fragNormal = mat3(transpose(inverse(model))) * normal; // Transform normal to world space
     fragTexCoords = texCoords;
-    gl_Position = projection * view * model * vec4(position, 1.0);
+    fragPosition = worldPosition.xyz;
+    gl_Position = projection * view * worldPosition;
 }
