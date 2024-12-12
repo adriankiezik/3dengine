@@ -289,7 +289,7 @@ void Editor::renderCenteredButton(const char *label, std::function<void()> onCli
 void Editor::addModelToScene()
 {
   std::vector<std::pair<std::string, std::string>> texturePaths = {{"texture_diffuse", diffusePath}};
-  Model newModel(modelPath, texturePaths, "../shaders/vertex_shader.glsl", "../shaders/fragment_shader.glsl");
+  Model newModel(modelPath, texturePaths, "../shaders/universal_vertex_shader.glsl", "../shaders/universal_fragment_shader.glsl");
   scene.addModel(newModel);
 
   modelPath.clear();

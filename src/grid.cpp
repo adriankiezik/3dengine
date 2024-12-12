@@ -15,10 +15,14 @@ Grid::~Grid()
 void Grid::render(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection, const glm::vec3 &cameraPosition, float renderRadius, const glm::vec3 &color)
 {
   shader.use();
+
   shader.setMat4("model", model);
   shader.setMat4("view", view);
   shader.setMat4("projection", projection);
   shader.setUniform3f("color", color.x, color.y, color.z);
+  shader.setUniform3f("cameraPosition", cameraPosition.x, cameraPosition.y, cameraPosition.z);
+  shader.setFloat("distanceThreshold", 25.0f);
+  shader.setFloat("fadeFactor", 0.1f);
 
   generateVertices(cameraPosition, renderRadius);
 
