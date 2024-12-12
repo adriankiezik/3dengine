@@ -29,6 +29,26 @@ void Model::Draw(const glm::vec3 &position, const glm::mat4 &view, const glm::ma
   {
     glm::mat4 modelMatrix = glm::mat4(1.0f);
     shader.setMat4("model", modelMatrix);
+
+    // Bind the normal map texture
+    for (unsigned int i = 0; i < mesh.textures.size(); i++)
+    {
+      glActiveTexture(GL_TEXTURE0 + i);
+      std::string name = mesh.textures[i].type;
+
+      // Ensure the normal map texture is assigned correctly
+      if (name == "texture_normal")
+      {
+        glUniform1i(glGetUniformLocation(shader.id, "texture_normal"), i);
+      }
+      else
+      {
+        glUniform1i(glGetUniformLocation(shader.id, name.c_str()), i);
+      }
+
+      glBindTexture(GL_TEXTURE_2D, mesh.textures[i].id);
+    }
+
     mesh.Draw(shader);
   }
 }
