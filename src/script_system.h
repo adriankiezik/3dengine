@@ -18,13 +18,17 @@ public:
   void update();
 
   void addScript(const std::string &path);
-  std::vector<Script> getScripts();
+
+  std::vector<Script> getScripts() const;
+  std::vector<std::string> getCapturedMessages() const;
 
 private:
   sol::state lua;
   std::vector<Script> scripts;
+  std::vector<std::string> capturedMessages;
 
   std::string loadScriptFromPath(const std::string &path);
+  void capturePrint(const std::string &message);
 };
 
 #endif

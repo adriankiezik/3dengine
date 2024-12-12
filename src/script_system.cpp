@@ -11,6 +11,10 @@ ScriptSystem::ScriptSystem()
 void ScriptSystem::init()
 {
   lua.open_libraries(sol::lib::base);
+
+  lua.set_function("print", [this](const std::string &msg)
+                   { capturePrint(msg); });
+
   lua.script(R"(
         print('Hello from Lua!')
     )");
@@ -35,7 +39,7 @@ void ScriptSystem::addScript(const std::string &path)
   scripts.push_back(newScript);
 }
 
-std::vector<Script> ScriptSystem::getScripts()
+std::vector<Script> ScriptSystem::getScripts() const
 {
   return scripts;
 }
@@ -64,4 +68,15 @@ std::string ScriptSystem::loadScriptFromPath(const std::string &path)
 
     return "";
   }
+}
+
+void ScriptSystem::capturePrint(const std::string &message)
+{
+  std::cout << message << std::endl;
+  capturedMessages.push_back(message);
+}
+
+std::vector<std::string> ScriptSystem::getCapturedMessages() const
+{
+  return capturedMessages;
 }

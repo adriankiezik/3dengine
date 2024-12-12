@@ -13,9 +13,8 @@ find_package(OpenGL REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
 find_package(assimp REQUIRED)
 
-file(GLOB SOURCES "src/*.cpp")
-file(GLOB IMGUI_SOURCES "lib/imgui/*.cpp")
-file(GLOB IMGUI_BACKEND_SOURCES "lib/imgui/backends/*.cpp")
+file(GLOB_RECURSE SOURCES "src/*.cpp")
+file(GLOB_RECURSE IMGUI_SOURCES "lib/imgui/*.cpp")
 file(GLOB LUA_SOURCES "lib/lua/src/*.c")
 
 add_library(glad src/glad.c)

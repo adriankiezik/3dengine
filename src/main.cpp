@@ -2,7 +2,7 @@
 
 int main()
 {
-  Engine engine("3dengine", 800, 600);
+  Engine engine("3dengine", 1280, 720);
 
   engine.run();
 

@@ -5,7 +5,7 @@ Engine::Engine(const std::string &title, int width, int height)
       camera(),
       scene(camera, window.getFramebuffer()),
       inputSystem(&camera, &window),
-      editor(window, scene, camera, scriptSystem, window.getFramebuffer()) {}
+      editor(window, scene, camera, scriptSystem, window.getFramebuffer(), consoleBuffer) {}
 
 void Engine::run()
 {

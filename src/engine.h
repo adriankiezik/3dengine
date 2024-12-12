@@ -3,12 +3,13 @@
 
 #include <string>
 #include "window.h"
-#include "editor.h"
+#include "editor/editor.h"
 #include "input_system.h"
 #include "script_system.h"
 #include "camera.h"
 #include "scene.h"
 #include "framebuffer.h"
+#include "console_stream_buffer.h"
 
 class Engine
 {
@@ -19,6 +20,8 @@ public:
 private:
   void update();
   void postUpdate();
+
+  ConsoleStreamBuffer consoleBuffer;
 
   Window window;
   Camera camera;
