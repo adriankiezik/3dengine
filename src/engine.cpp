@@ -12,7 +12,8 @@ void Engine::run()
   std::vector<std::pair<std::string, std::string>> texturePaths = {
       {"texture_diffuse", "../resources/gitignored/table/DefaultMaterial_BaseColor.png"}};
   Model model("../resources/gitignored/table/Table.obj", texturePaths, "../shaders/universal_vertex_shader.glsl", "../shaders/universal_fragment_shader.glsl");
-  scene.addModel(model);
+  Object object(model, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+  scene.addObject(object);
 
   while (!window.shouldClose())
   {

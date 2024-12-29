@@ -14,7 +14,7 @@ Editor::Editor(Window &window, Scene &scene, Camera &camera,
       menuBar(window),
       viewportWindow(framebuffer, camera),
       consoleWindow(console),
-      hierarchyWindow(),
+      hierarchyWindow(scene),
       diagnosticsWindow(),
       scriptsWindow()
 {

@@ -7,9 +7,9 @@ Scene::Scene(
     Framebuffer &framebuffer) : camera(camera), framebuffer(framebuffer),
                                 grid(1.5f, "../shaders/grid_vertex_shader.glsl", "../shaders/grid_fragment_shader.glsl") {}
 
-void Scene::addModel(const Model &model)
+void Scene::addObject(const Object &object)
 {
-  models.push_back(model);
+  objects.push_back(object);
 }
 
 void Scene::update()
@@ -18,9 +18,9 @@ void Scene::update()
 
   grid.render(glm::mat4(1.0f), camera.getViewMatrix(), camera.getProjectionMatrix(), camera.getPosition(), 100, glm::vec3(0.4f, 0.6f, 0.8f));
 
-  for (Model &model : models)
+  for (Object &object : objects)
   {
-    model.Draw(camera.getPosition(), camera.getViewMatrix(), camera.getProjectionMatrix());
+    object.Draw(camera.getPosition(), camera.getViewMatrix(), camera.getProjectionMatrix());
   }
 
   framebuffer.unbind();

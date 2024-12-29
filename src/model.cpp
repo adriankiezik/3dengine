@@ -15,21 +15,23 @@ Model::Model(const std::string &modelPath,
   loadModel(modelPath, texturePaths);
 }
 
-void Model::Draw(const glm::vec3 &position, const glm::mat4 &view, const glm::mat4 &projection)
+void Model::Draw(const glm::mat4 &transform, const glm::mat4 &view, const glm::mat4 &projection)
 {
   shader.use();
   shader.setMat4("view", view);
   shader.setMat4("projection", projection);
+  shader.setMat4("model", transform);
 
   shader.setUniform3f("lightDirection", 1.0f, -1.0f, -1.0f); // Sunlight direction
   shader.setUniform3f("lightColor", 1.0f, 1.0f, 1.0f);       // White sunlight
-  shader.setUniform3f("viewPosition", position.x, position.y, position.z);
+
+  // Extract camera position from view matrix
+  glm::mat4 invView = glm::inverse(view);
+  glm::vec3 cameraPos(invView[3]);
+  shader.setUniform3f("viewPosition", cameraPos.x, cameraPos.y, cameraPos.z);
 
   for (Mesh &mesh : meshes)
   {
-    glm::mat4 modelMatrix = glm::mat4(1.0f);
-    shader.setMat4("model", modelMatrix);
-
     // Bind the normal map texture
     for (unsigned int i = 0; i < mesh.textures.size(); i++)
     {

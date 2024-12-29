@@ -1,7 +1,7 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include "model.h"
+#include "object.h"
 #include <vector>
 #include "camera.h"
 #include "window.h"
@@ -12,14 +12,15 @@ class Scene
 {
 public:
   Scene(Camera &camera, Framebuffer &framebuffer);
-  void addModel(const Model &model);
+  void addObject(const Object &object);
   void update();
+  const std::vector<Object> &getObjects() const { return objects; }
+  std::vector<Object> &getObjects() { return objects; }
 
 private:
   Camera &camera;
   Framebuffer &framebuffer;
-  std::vector<Model> models;
-
+  std::vector<Object> objects;
   Grid grid;
 };
 
