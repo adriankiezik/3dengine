@@ -10,7 +10,11 @@ Model::Model(const std::string &modelPath,
              std::vector<std::pair<std::string, std::string>> texturePaths,
              const std::string &vertexShaderPath,
              const std::string &fragmentShaderPath)
-    : shader(vertexShaderPath.c_str(), fragmentShaderPath.c_str())
+    : shader(vertexShaderPath.c_str(), fragmentShaderPath.c_str()),
+      modelPath(modelPath),
+      vertexShaderPath(vertexShaderPath),
+      fragmentShaderPath(fragmentShaderPath),
+      texturePaths(texturePaths)
 {
   loadModel(modelPath, texturePaths);
 }

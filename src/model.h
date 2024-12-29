@@ -18,7 +18,18 @@ public:
         const std::string &fragmentShaderPath);
   void Draw(const glm::mat4 &transform, const glm::mat4 &view, const glm::mat4 &projection);
 
+  // Getters for serialization
+  const std::string& getModelPath() const { return modelPath; }
+  const std::string& getVertexShaderPath() const { return vertexShaderPath; }
+  const std::string& getFragmentShaderPath() const { return fragmentShaderPath; }
+  const std::vector<std::pair<std::string, std::string>>& getTexturePaths() const { return texturePaths; }
+
 private:
+  std::string modelPath;
+  std::string vertexShaderPath;
+  std::string fragmentShaderPath;
+  std::vector<std::pair<std::string, std::string>> texturePaths;
+  
   Shader shader;
   std::vector<Mesh> meshes;
   std::unordered_map<std::string, Texture> loadedTextures;

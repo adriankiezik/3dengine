@@ -1,6 +1,7 @@
 #include "scene.h"
 #include <iostream>
 #include "framebuffer.h"
+#include <nlohmann/json.hpp>
 
 Scene::Scene(
     Camera &camera,
@@ -24,4 +25,118 @@ void Scene::update()
   }
 
   framebuffer.unbind();
+}
+
+nlohmann::json Scene::toJson() const
+{
+  nlohmann::json sceneData;
+  sceneData["objects"] = nlohmann::json::array();
+
+  const auto &objects = getObjects();
+  for (size_t i = 0; i < objects.size(); ++i)
+  {
+    const auto &obj = objects[i];
+    nlohmann::json objData;
+
+    // Object transform properties
+    objData["name"] = obj.getName();
+    objData["position"] = {
+        obj.getPosition().x,
+        obj.getPosition().y,
+        obj.getPosition().z};
+    objData["rotation"] = {
+        obj.getRotation().x,
+        obj.getRotation().y,
+        obj.getRotation().z};
+    objData["scale"] = {
+        obj.getScale().x,
+        obj.getScale().y,
+        obj.getScale().z};
+
+    // Model properties
+    const Model &model = obj.getModel();
+    objData["model"] = {
+        {"modelPath", model.getModelPath()},
+        {"vertexShader", model.getVertexShaderPath()},
+        {"fragmentShader", model.getFragmentShaderPath()},
+        {"textures", nlohmann::json::array()}};
+
+    // Add textures
+    size_t textureIndex = 0;
+    for (const auto &texture : model.getTexturePaths())
+    {
+      objData["model"]["textures"][textureIndex++] = {
+          {"type", texture.first},
+          {"path", texture.second}};
+    }
+
+    sceneData["objects"][i] = objData;
+  }
+
+  return sceneData;
+}
+
+void Scene::fromJson(const nlohmann::json &json)
+{
+  clear();
+
+  if (!json.contains("scene") || !json["scene"].is_object())
+    return;
+
+  const auto &objectsData = json["scene"]["objects"];
+  if (!objectsData.is_array())
+    return;
+
+  for (const auto &objData : objectsData)
+  {
+    try
+    {
+      // Extract model data
+      const auto &modelData = objData["model"];
+      std::vector<std::pair<std::string, std::string>> textures;
+
+      // Load textures
+      for (const auto &textureData : modelData["textures"])
+      {
+        textures.push_back({textureData["type"].get<std::string>(),
+                            textureData["path"].get<std::string>()});
+      }
+
+      // Create model
+      Model model(
+          modelData["modelPath"].get<std::string>(),
+          textures,
+          modelData["vertexShader"].get<std::string>(),
+          modelData["fragmentShader"].get<std::string>());
+
+      // Create object with transform properties
+      Object obj(
+          model,
+          glm::vec3(
+              objData["position"][0].get<float>(),
+              objData["position"][1].get<float>(),
+              objData["position"][2].get<float>()),
+          glm::vec3(
+              objData["rotation"][0].get<float>(),
+              objData["rotation"][1].get<float>(),
+              objData["rotation"][2].get<float>()),
+          glm::vec3(
+              objData["scale"][0].get<float>(),
+              objData["scale"][1].get<float>(),
+              objData["scale"][2].get<float>()),
+          objData["name"].get<std::string>());
+
+      addObject(obj);
+    }
+    catch (const std::exception &e)
+    {
+      std::cerr << "Error loading object: " << e.what() << std::endl;
+      continue; // Skip this object and try to load others
+    }
+  }
+}
+
+void Scene::clear()
+{
+  objects.clear();
 }

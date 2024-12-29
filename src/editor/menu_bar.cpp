@@ -2,8 +2,12 @@
 #include <iostream>
 #include <cstdlib>
 #include <GLFW/glfw3.h>
+#include <nlohmann/json.hpp>
+#include <fstream>
+#include <filesystem>
 
-MenuBar::MenuBar(Window &window) : window(window) {}
+MenuBar::MenuBar(Window &window, Scene &scene, Camera &camera)
+    : window(window), scene(scene), camera(camera) {}
 
 void MenuBar::render()
 {
@@ -16,6 +20,7 @@ void MenuBar::render()
       }
       if (ImGui::MenuItem("Save"))
       {
+        saveScene();
       }
       if (ImGui::MenuItem("Settings"))
       {
@@ -86,4 +91,60 @@ void MenuBar::openBrowser(const char *url)
 #else
   std::cerr << "Platform not supported!" << std::endl;
 #endif
+}
+
+void MenuBar::saveScene()
+{
+  if (currentProjectPath.empty())
+  {
+    std::cerr << "No project is currently open" << std::endl;
+    return;
+  }
+
+  std::cout << "Current project path: " << currentProjectPath << std::endl;
+  std::filesystem::path projectPath(currentProjectPath);
+  std::filesystem::path scenesDir = projectPath / "scenes";
+  std::filesystem::path sceneFile = scenesDir / "scene.3dscene";
+
+  // Create scenes directory if it doesn't exist
+  try
+  {
+    if (!std::filesystem::exists(scenesDir))
+    {
+      std::filesystem::create_directories(scenesDir);
+      std::cout << "Created scenes directory: " << scenesDir << std::endl;
+    }
+  }
+  catch (const std::filesystem::filesystem_error &e)
+  {
+    std::cerr << "Failed to create scenes directory: " << e.what() << std::endl;
+    return;
+  }
+
+  std::cout << "Saving scene to: " << sceneFile << std::endl;
+  std::cout << "Scene objects count: " << scene.getObjects().size() << std::endl;
+
+  std::ofstream sceneStream(sceneFile);
+  if (!sceneStream.is_open())
+  {
+    std::cerr << "Failed to open scene file for writing: " << sceneFile << std::endl;
+    return;
+  }
+
+  try
+  {
+    nlohmann::ordered_json sceneData;
+
+    sceneData["camera"] = camera.toJson();
+    sceneData["scene"] = scene.toJson();
+
+    sceneStream << sceneData.dump(4);
+    sceneStream.close();
+
+    std::cout << "Scene saved successfully" << std::endl;
+  }
+  catch (const std::exception &e)
+  {
+    std::cerr << "Error while saving scene: " << e.what() << std::endl;
+  }
 }

@@ -11,14 +11,14 @@ Editor::Editor(Window &window, Scene &scene, Camera &camera,
       scriptSystem(scriptSystem),
       framebuffer(framebuffer),
       console(console),
-      menuBar(window),
+      menuBar(window, scene, camera),
       viewportWindow(framebuffer, camera),
       consoleWindow(console),
       hierarchyWindow(scene),
       diagnosticsWindow(),
       scriptsWindow(),
-      projectSelection(projectCreation, window),
-      projectCreation(projectSelection)
+      projectSelection(projectCreation, window, camera, menuBar, scene),
+      projectCreation(projectSelection, menuBar)
 {
   if (!init())
   {

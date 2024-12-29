@@ -5,9 +5,11 @@
 #include <nlohmann/json.hpp>
 #include "imfilebrowser.h"
 #include "project_selection.h"
+#include "../menu_bar.h"
 
-ProjectCreationWindow::ProjectCreationWindow(ProjectSelection &projectSelection)
+ProjectCreationWindow::ProjectCreationWindow(ProjectSelection &projectSelection, MenuBar &menuBar)
     : projectSelection(projectSelection),
+      menuBar(menuBar),
       projectName(""),
       projectDescription(""),
       projectPath(std::filesystem::current_path().string()),
@@ -127,19 +129,18 @@ void ProjectCreationWindow::createProject()
     return;
 
   std::filesystem::path projectDir(projectPath);
-  if (!std::filesystem::exists(projectDir))
-  {
-    std::filesystem::create_directories(projectDir);
 
-    // Create project subdirectories
-    auto assetsDir = projectDir / "assets";
-    auto scenesDir = projectDir / "scenes";
-    auto scriptsDir = projectDir / "scripts";
+  // Create project directory and subdirectories
+  std::filesystem::create_directories(projectDir);
 
-    std::filesystem::create_directories(assetsDir);
-    std::filesystem::create_directories(scenesDir);
-    std::filesystem::create_directories(scriptsDir);
-  }
+  // Create project subdirectories
+  auto assetsDir = projectDir / "assets";
+  auto scenesDir = projectDir / "scenes";
+  auto scriptsDir = projectDir / "scripts";
+
+  std::filesystem::create_directories(assetsDir);
+  std::filesystem::create_directories(scenesDir);
+  std::filesystem::create_directories(scriptsDir);
 
   std::string projectFile = (projectDir / (projectName + ".3dproj")).string();
   std::ofstream file(projectFile);
@@ -156,10 +157,24 @@ void ProjectCreationWindow::createProject()
     file << projectData.dump(4);
     file.close();
 
+    menuBar.setCurrentProjectPath(projectDir.string());
+
+    std::string sceneFile = (projectDir / "scenes" / "scene.3dscene").string();
+    std::ofstream sceneFileStream(sceneFile);
+    if (sceneFileStream.is_open())
+    {
+      nlohmann::ordered_json sceneData = {
+          {"objects", nlohmann::json::array()},
+          {"camera", {{"position", {0.0f, 0.0f, 0.0f}}, {"fov", 65.0f}}}};
+      sceneFileStream << sceneData.dump(4);
+      sceneFileStream.close();
+    }
+
     projectSelection.setProjectName(projectName);
     projectSelection.setProjectDescription(projectDescription);
 
     hide();
+
     projectSelection.setProjectSelected(true);
   }
 }

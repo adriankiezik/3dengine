@@ -7,6 +7,8 @@
 #include "window.h"
 #include "framebuffer.h"
 #include "grid.h"
+#include <memory>
+#include <nlohmann/json.hpp>
 
 class Scene
 {
@@ -16,6 +18,12 @@ public:
   void update();
   const std::vector<Object> &getObjects() const { return objects; }
   std::vector<Object> &getObjects() { return objects; }
+  void removeObject(size_t index);
+  void clear();
+
+  // Serialization methods
+  nlohmann::json toJson() const;
+  void fromJson(const nlohmann::json &json);
 
 private:
   Camera &camera;

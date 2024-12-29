@@ -1,4 +1,5 @@
 #include "camera.h"
+#include <nlohmann/json.hpp>
 
 Camera::Camera()
     : position(glm::vec3(0.0f, 0.0f, 0.0f)),
@@ -162,4 +163,25 @@ float Camera::getAspectRatio() const
 void Camera::setAspectRatio(float newAspectRatio)
 {
   aspectRatio = newAspectRatio;
+}
+
+nlohmann::json Camera::toJson() const
+{
+  return {
+    {"position", {position.x, position.y, position.z}},
+    {"fov", fov}
+  };
+}
+
+void Camera::fromJson(const nlohmann::json &json)
+{
+  if (json.contains("position"))
+  {
+    const auto &pos = json["position"];
+    setPosition(glm::vec3(pos[0], pos[1], pos[2]));
+  }
+  if (json.contains("fov"))
+  {
+    setFov(json["fov"]);
+  }
 }

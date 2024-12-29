@@ -4,13 +4,14 @@
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "imfilebrowser.h"
+#include "../menu_bar.h"
 
 class ProjectSelection;
 
 class ProjectCreationWindow
 {
 public:
-  ProjectCreationWindow(ProjectSelection &projectSelection);
+  ProjectCreationWindow(ProjectSelection &projectSelection, MenuBar &menuBar);
   void render();
   void show() { isVisible = true; }
   void hide() { isVisible = false; }
@@ -18,6 +19,7 @@ public:
 
 private:
   ProjectSelection &projectSelection;
+  MenuBar &menuBar;
   std::string projectName;
   std::string projectDescription;
   std::string projectPath;

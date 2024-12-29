@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
+#include <nlohmann/json.hpp>
 
 class Camera
 {
@@ -43,6 +44,9 @@ public:
 
   void toggleMouseInput();
   void toggleKeyboardInput();
+
+  nlohmann::json toJson() const;
+  void fromJson(const nlohmann::json &json);
 
 private:
   bool mouseInputEnabled;

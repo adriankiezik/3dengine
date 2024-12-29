@@ -6,8 +6,10 @@
 #include <iostream>
 #include <cstdlib>
 #include <filesystem>
+#include <glm/glm.hpp>
 
-ProjectSelection::ProjectSelection(ProjectCreationWindow &projectCreationWindow, Window &window) : projectCreationWindow(projectCreationWindow), fileDialog(0), projectSelected(false), window(window)
+ProjectSelection::ProjectSelection(ProjectCreationWindow &projectCreationWindow, Window &window, Camera &camera, MenuBar &menuBar, Scene &scene)
+    : projectCreationWindow(projectCreationWindow), fileDialog(0), projectSelected(false), window(window), camera(camera), menuBar(menuBar), scene(scene)
 {
   fileDialog.SetTitle("Select Project File");
   fileDialog.SetTypeFilters({".3dproj"});
@@ -64,10 +66,34 @@ void ProjectSelection::render()
         setProjectName(projectData["ProjectName"]);
         setProjectDescription(projectData["Description"]);
 
-        window.setTitle("3dengine - " + projectData["ProjectName"].get<std::string>());
+        // Set current project path in MenuBar
+        menuBar.setCurrentProjectPath(selectedPath.parent_path().string());
 
-        fileDialog.ClearSelected();
-        projectSelected = true;
+        // Load and configure scene
+        std::filesystem::path projectPath = selectedPath.parent_path();
+        std::string sceneFile = (projectPath / "scenes" / "scene.3dscene").string();
+
+        std::ifstream sceneStream(sceneFile);
+        if (sceneStream.is_open())
+        {
+          nlohmann::json sceneData = nlohmann::json::parse(sceneStream);
+          sceneStream.close();
+
+          if (sceneData.contains("camera"))
+          {
+            camera.fromJson(sceneData["camera"]);
+          }
+
+          if (sceneData.contains("scene"))
+          {
+            scene.fromJson(sceneData);
+          }
+
+          window.setTitle("3dengine - " + projectData["ProjectName"].get<std::string>());
+
+          fileDialog.ClearSelected();
+          projectSelected = true;
+        }
       }
       catch (const std::exception &e)
       {
