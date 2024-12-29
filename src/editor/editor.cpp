@@ -12,13 +12,13 @@ Editor::Editor(Window &window, Scene &scene, Camera &camera,
       framebuffer(framebuffer),
       console(console),
       menuBar(window, scene, camera),
+      projectSelection(projectCreation, window, camera, menuBar, scene),
+      projectCreation(projectSelection, menuBar),
       viewportWindow(framebuffer, camera),
       consoleWindow(console),
       hierarchyWindow(scene),
-      diagnosticsWindow(),
-      scriptsWindow(),
-      projectSelection(projectCreation, window, camera, menuBar, scene),
-      projectCreation(projectSelection, menuBar)
+      scriptsWindow(scene),
+      diagnosticsWindow()
 {
   if (!init())
   {

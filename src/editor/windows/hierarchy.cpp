@@ -118,21 +118,54 @@ void HierarchyWindow::renderObjectProperties(Object &object)
 
 void HierarchyWindow::renderTransformProperties(Object &object)
 {
-  glm::vec3 position = object.getPosition();
-  if (ImGui::DragFloat3("Position", &position[0], 0.1f))
+  if (ImGui::CollapsingHeader("Transform"))
   {
-    object.setPosition(position);
+    glm::vec3 position = object.getPosition();
+    if (ImGui::DragFloat3("Position", &position[0], 0.1f))
+    {
+      object.setPosition(position);
+    }
+
+    glm::vec3 rotation = object.getRotation();
+    if (ImGui::DragFloat3("Rotation", &rotation[0], 1.0f))
+    {
+      object.setRotation(rotation);
+    }
+
+    glm::vec3 scale = object.getScale();
+    if (ImGui::DragFloat3("Scale", &scale[0], 0.1f))
+    {
+      object.setScale(scale);
+    }
   }
 
-  glm::vec3 rotation = object.getRotation();
-  if (ImGui::DragFloat3("Rotation", &rotation[0], 1.0f))
+  // Scripts section
+  if (ImGui::CollapsingHeader("Scripts"))
   {
-    object.setRotation(rotation);
-  }
+    const auto &scripts = object.getScripts();
+    if (scripts.empty())
+    {
+      ImGui::TextDisabled("No scripts attached");
+    }
+    else
+    {
+      for (size_t i = 0; i < scripts.size(); i++)
+      {
+        const auto &script = scripts[i];
+        std::string label = script.name + "##script" + std::to_string(i);
 
-  glm::vec3 scale = object.getScale();
-  if (ImGui::DragFloat3("Scale", &scale[0], 0.1f))
-  {
-    object.setScale(scale);
+        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+        ImGui::TreeNodeEx(label.c_str(), flags);
+
+        if (ImGui::BeginPopupContextItem())
+        {
+          if (ImGui::MenuItem("Remove"))
+          {
+            object.removeScript(script.name);
+          }
+          ImGui::EndPopup();
+        }
+      }
+    }
   }
 }
