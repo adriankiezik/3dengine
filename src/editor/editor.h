@@ -8,6 +8,7 @@
 #include "windows/diagnostics.h"
 #include "windows/scripts.h"
 #include "windows/project_selection.h"
+#include "windows/project_creation.h"
 #include "../window.h"
 #include "../scene.h"
 #include "../script_system.h"
@@ -35,6 +36,7 @@ private:
 
   MenuBar menuBar;
   ProjectSelection projectSelection;
+  ProjectCreationWindow projectCreation;
   ViewportWindow viewportWindow;
   ConsoleWindow consoleWindow;
   HierarchyWindow hierarchyWindow;

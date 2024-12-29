@@ -24,6 +24,8 @@ public:
   int getFramesPerSecond() const;
   float getDeltaTime() const;
 
+  void setTitle(const std::string &title);
+
   ~Window();
 
 private:

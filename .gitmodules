@@ -1,3 +1,7 @@
 [submodule "lib/sol"]
 	path = lib/sol
 	url = git@github.com:ThePhD/sol2.git
+
+[submodule "lib/json"]
+	path = lib/json
+	url = git@github.com:nlohmann/json.git

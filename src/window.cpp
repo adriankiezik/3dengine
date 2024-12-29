@@ -136,4 +136,10 @@ void Window::updateMousePosition()
   io.MousePos = ImVec2((float)mouseX, (float)mouseY);
 }
 
+void Window::setTitle(const std::string &title)
+{
+  this->title = title.c_str();
+  glfwSetWindowTitle(window, title.c_str());
+}
+
 Window::~Window() { terminate(); }

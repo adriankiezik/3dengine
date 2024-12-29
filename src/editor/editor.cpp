@@ -17,7 +17,8 @@ Editor::Editor(Window &window, Scene &scene, Camera &camera,
       hierarchyWindow(scene),
       diagnosticsWindow(),
       scriptsWindow(),
-      projectSelection()
+      projectSelection(projectCreation, window),
+      projectCreation(projectSelection)
 {
   if (!init())
   {
@@ -57,22 +58,17 @@ void Editor::shutdown()
 
 void Editor::update()
 {
-  if (!initialized)
-  {
-    initialized = true;
-  }
-
   startFrame();
 
   if (!projectSelection.isProjectSelected())
   {
     projectSelection.render();
+    projectCreation.render();
     endFrame();
     return;
   }
 
   menuBar.render();
-
   viewportWindow.render();
   consoleWindow.render(menuBar.showConsole);
   hierarchyWindow.render(menuBar.showHierarchy);

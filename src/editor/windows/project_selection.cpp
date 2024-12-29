@@ -1,7 +1,11 @@
 #include "project_selection.h"
+#include "project_creation.h"
 #include "imfilebrowser.h"
+#include <nlohmann/json.hpp>
+#include <fstream>
+#include <iostream>
 
-ProjectSelection::ProjectSelection() : fileDialog(0), projectSelected(false)
+ProjectSelection::ProjectSelection(ProjectCreationWindow &projectCreationWindow, Window &window) : projectCreationWindow(projectCreationWindow), fileDialog(0), projectSelected(false), window(window)
 {
   fileDialog.SetTitle("Select Project File");
   fileDialog.SetTypeFilters({".3dproj"});
@@ -9,29 +13,25 @@ ProjectSelection::ProjectSelection() : fileDialog(0), projectSelected(false)
 
 void ProjectSelection::render()
 {
-  ImGui::OpenPopup("Project Selection");
+  if (projectCreationWindow.isShown())
+    return;
 
-  ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-  ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+  ImGui::Begin("Project Selection", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
-  if (ImGui::BeginPopupModal("Project Selection", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+  ImGui::SetWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f - ImGui::GetWindowWidth() * 0.5f,
+                             ImGui::GetIO().DisplaySize.y * 0.5f - ImGui::GetWindowHeight() * 0.5f));
+
+  ImGui::Text("Welcome to the 3dengine!");
+  ImGui::Separator();
+
+  if (ImGui::Button("Create New Project", ImVec2(200, 0)))
   {
-    ImGui::Text("Welcome to the 3D Engine!");
-    ImGui::Separator();
+    projectCreationWindow.show();
+  }
 
-    if (ImGui::Button("Create New Project", ImVec2(200, 0)))
-    {
-      // TODO: Implement new project creation
-      projectSelected = true;
-      ImGui::CloseCurrentPopup();
-    }
-
-    ImGui::Spacing();
-
-    if (ImGui::Button("Open Existing Project", ImVec2(200, 0)))
-    {
-      fileDialog.Open();
-    }
+  if (ImGui::Button("Open Existing Project", ImVec2(200, 0)))
+  {
+    fileDialog.Open();
   }
 
   fileDialog.Display();
@@ -39,10 +39,31 @@ void ProjectSelection::render()
   if (fileDialog.HasSelected())
   {
     std::filesystem::path selectedPath = fileDialog.GetSelected();
-    // TODO: Load the project from the selected path
-    fileDialog.ClearSelected();
-    projectSelected = true;
+
+    // Load and parse the project file
+    std::ifstream file(selectedPath);
+    if (file.is_open())
+    {
+      try
+      {
+        nlohmann::json projectData = nlohmann::json::parse(file);
+
+        setProjectName(projectData["ProjectName"]);
+        setProjectDescription(projectData["Description"]);
+        setProjectPath(projectData["Path"]);
+
+        window.setTitle("3dengine - " + projectData["ProjectName"].get<std::string>());
+
+        fileDialog.ClearSelected();
+        projectSelected = true;
+      }
+      catch (const std::exception &e)
+      {
+        std::cerr << "Error loading project: " << e.what() << std::endl;
+      }
+      file.close();
+    }
   }
 
-  ImGui::EndPopup();
+  ImGui::End();
 }
