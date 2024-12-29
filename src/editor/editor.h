@@ -31,6 +31,7 @@ private:
   ConsoleStreamBuffer &console;
 
   bool initialized = false;
+  bool projectDialogShown = false;
 
   MenuBar menuBar;
   ViewportWindow viewportWindow;
@@ -43,6 +44,7 @@ private:
   void shutdown();
   void startFrame();
   void endFrame();
+  void renderProjectDialog();
 };
 
 #endif
