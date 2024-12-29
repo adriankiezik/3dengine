@@ -2,16 +2,18 @@
 #define PROJECT_SELECTION_H
 
 #include <imgui.h>
+#include "imfilebrowser.h"
 
 class ProjectSelection
 {
 public:
-    ProjectSelection();
-    void render();
-    bool isProjectSelected() const { return projectSelected; }
+  ProjectSelection();
+  void render();
+  bool isProjectSelected() const { return projectSelected; }
 
 private:
-    bool projectSelected;
+  bool projectSelected;
+  ImGui::FileBrowser fileDialog;
 };
 
 #endif
