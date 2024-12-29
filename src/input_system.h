@@ -19,11 +19,10 @@ private:
   static float lastX;
   static float lastY;
   static bool firstMouse;
-  static bool isF1Pressed;
+  static bool isRightMousePressed;
 
   static void mouseCallback(GLFWwindow *window, double xpos, double ypos);
   static void toggleCameraInputHandling();
-  static bool isF1KeyPressed();
   static void configureImGuiMouseHandling();
   static void setupCallbacks();
 };

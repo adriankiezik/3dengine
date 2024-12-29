@@ -7,7 +7,7 @@ Window *InputSystem::window = nullptr;
 float InputSystem::lastX = 400.0f;
 float InputSystem::lastY = 300.0f;
 bool InputSystem::firstMouse = true;
-bool InputSystem::isF1Pressed = false;
+bool InputSystem::isRightMousePressed = false;
 
 InputSystem::InputSystem(Camera *camera, Window *window)
 {
@@ -22,30 +22,19 @@ void InputSystem::update()
 {
   if (camera && window)
   {
-    camera->processKeyboardInput(window->getWindow(), window->getDeltaTime());
-  }
+    bool rightMouseDown = glfwGetMouseButton(window->getWindow(), GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS;
 
-  if (isF1KeyPressed())
-  {
-    toggleCameraInputHandling();
-  }
-}
-
-bool InputSystem::isF1KeyPressed()
-{
-  if (glfwGetKey(window->getWindow(), GLFW_KEY_F1) == GLFW_PRESS)
-  {
-    if (!isF1Pressed)
+    if (rightMouseDown != isRightMousePressed)
     {
-      isF1Pressed = true;
-      return true;
+      isRightMousePressed = rightMouseDown;
+      toggleCameraInputHandling();
+    }
+
+    if (isRightMousePressed)
+    {
+      camera->processKeyboardInput(window->getWindow(), window->getDeltaTime());
     }
   }
-  else
-  {
-    isF1Pressed = false;
-  }
-  return false;
 }
 
 void InputSystem::mouseCallback(GLFWwindow *window, double xpos, double ypos)
@@ -59,10 +48,11 @@ void InputSystem::mouseCallback(GLFWwindow *window, double xpos, double ypos)
 
   float xOffset = xpos - lastX;
   float yOffset = lastY - ypos;
+
   lastX = xpos;
   lastY = ypos;
 
-  if (camera)
+  if (isRightMousePressed)
   {
     camera->processMouseInput(xOffset, yOffset);
   }
@@ -73,14 +63,14 @@ void InputSystem::toggleCameraInputHandling()
   camera->toggleMouseInput();
   camera->toggleKeyboardInput();
   glfwSetInputMode(window->getWindow(), GLFW_CURSOR,
-                   camera->isKeyboardInputEnabled() ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+                   isRightMousePressed ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
   configureImGuiMouseHandling();
 }
 
 void InputSystem::configureImGuiMouseHandling()
 {
   ImGuiIO &io = ImGui::GetIO();
-  bool disableMouse = !camera->isKeyboardInputEnabled();
+  bool disableMouse = !isRightMousePressed;
   io.ConfigFlags = disableMouse ? io.ConfigFlags & ~ImGuiConfigFlags_NoMouse : io.ConfigFlags | ImGuiConfigFlags_NoMouse;
 }
 
@@ -88,5 +78,5 @@ void InputSystem::setupCallbacks()
 {
   glfwSetCursorPosCallback(window->getWindow(), mouseCallback);
   glfwSetInputMode(window->getWindow(), GLFW_CURSOR,
-                   camera->isKeyboardInputEnabled() ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+                   isRightMousePressed ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
 }

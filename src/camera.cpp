@@ -8,8 +8,8 @@ Camera::Camera()
       movementSpeed(1.0f),
       mouseSensitivity(0.1f),
       fov(65.0f),
-      mouseInputEnabled(true),
-      keyboardInputEnabled(true)
+      mouseInputEnabled(false),
+      keyboardInputEnabled(false)
 {
   updateCameraVectors();
 }
