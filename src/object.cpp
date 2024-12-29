@@ -33,8 +33,9 @@ void Object::setScale(const glm::vec3 &newScale)
   scale = newScale;
 }
 
-void Object::setName(const std::string &newName) {
-    name = newName;
+void Object::setName(const std::string &newName)
+{
+  name = newName;
 }
 
 glm::vec3 Object::getPosition() const
@@ -57,6 +58,34 @@ const Model &Object::getModel() const
   return model;
 }
 
-const std::string &Object::getName() const {
-    return name;
+const std::string &Object::getName() const
+{
+  return name;
+}
+
+void Object::addScript(const Script &script)
+{
+  auto it = std::find_if(scripts.begin(), scripts.end(),
+                         [&script](const Script &s)
+                         { return s.name == script.name; });
+
+  if (it == scripts.end())
+  {
+    scripts.push_back(script);
+  }
+}
+
+void Object::addScript(const std::string &scriptPath)
+{
+  Script script(scriptPath);
+  scripts.push_back(script);
+}
+
+void Object::removeScript(const std::string &scriptName)
+{
+  scripts.erase(
+      std::remove_if(scripts.begin(), scripts.end(),
+                     [&scriptName](const Script &s)
+                     { return s.name == scriptName; }),
+      scripts.end());
 }

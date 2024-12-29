@@ -2,9 +2,11 @@
 #define OBJECT_H
 
 #include "model.h"
+#include "script.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <string>
+#include <vector>
 
 class Object
 {
@@ -16,7 +18,6 @@ public:
 
   void Draw(const glm::vec3 &cameraPos, const glm::mat4 &view, const glm::mat4 &projection);
 
-  // Getters and setters for transform properties
   void setPosition(const glm::vec3 &newPosition);
   void setRotation(const glm::vec3 &newRotation);
   void setScale(const glm::vec3 &newScale);
@@ -28,12 +29,20 @@ public:
   const Model &getModel() const;
   const std::string &getName() const;
 
+  void addScript(const Script &script);
+  void addScript(const std::string &scriptPath); // Add script from path
+  void removeScript(const std::string &scriptName);
+  const std::vector<Script> &getScripts() const { return scripts; }
+
 private:
+  std::string name;
   Model model;
+
+  std::vector<Script> scripts;
+
   glm::vec3 position;
   glm::vec3 rotation; // in degrees
   glm::vec3 scale;
-  std::string name;
 };
 
 #endif

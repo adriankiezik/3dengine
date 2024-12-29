@@ -66,10 +66,8 @@ void ProjectSelection::render()
         setProjectName(projectData["ProjectName"]);
         setProjectDescription(projectData["Description"]);
 
-        // Set current project path in MenuBar
         menuBar.setCurrentProjectPath(selectedPath.parent_path().string());
 
-        // Load and configure scene
         std::filesystem::path projectPath = selectedPath.parent_path();
         std::string sceneFile = (projectPath / "scenes" / "scene.3dscene").string();
 

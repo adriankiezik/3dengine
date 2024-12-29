@@ -2,33 +2,33 @@
 #define SCRIPT_SYSTEM_H
 
 #include <sol/sol.hpp>
-
-struct Script
-{
-  std::string name;
-  std::string path;
-  std::string content;
-};
+#include <string>
+#include <vector>
+#include <set>
+#include <map>
+#include <nlohmann/json.hpp>
+#include "script.h"
+#include "scene.h"
 
 class ScriptSystem
 {
 public:
-  ScriptSystem();
+  ScriptSystem(Scene &scene);
   void init();
   void update();
 
-  void addScript(const std::string &path);
-
-  std::vector<Script> getScripts() const;
   std::vector<std::string> getCapturedMessages() const;
 
 private:
   sol::state lua;
-  std::vector<Script> scripts;
+  Scene &scene;
   std::vector<std::string> capturedMessages;
+  std::set<std::string> initializedScripts;
+  std::map<std::string, sol::environment> scriptEnvironments;  // Store environments for each script
 
-  std::string loadScriptFromPath(const std::string &path);
   void capturePrint(const std::string &message);
+  void executeScript(const Script &script, Object &object);
+  std::string getScriptKey(const Script &script, const Object &object);
 };
 
 #endif

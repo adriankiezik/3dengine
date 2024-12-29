@@ -70,6 +70,13 @@ nlohmann::json Scene::toJson() const
           {"path", texture.second}};
     }
 
+    // Add scripts
+    objData["scripts"] = nlohmann::json::array();
+    for (const auto &script : obj.getScripts())
+    {
+      objData["scripts"].push_back(script.path);
+    }
+
     sceneData["objects"][i] = objData;
   }
 
@@ -103,35 +110,34 @@ void Scene::fromJson(const nlohmann::json &json)
       }
 
       // Create model
-      Model model(
-          modelData["modelPath"].get<std::string>(),
-          textures,
-          modelData["vertexShader"].get<std::string>(),
-          modelData["fragmentShader"].get<std::string>());
+      Model model(modelData["modelPath"].get<std::string>(),
+                  textures,
+                  modelData["vertexShader"].get<std::string>(),
+                  modelData["fragmentShader"].get<std::string>());
 
-      // Create object with transform properties
-      Object obj(
-          model,
-          glm::vec3(
-              objData["position"][0].get<float>(),
-              objData["position"][1].get<float>(),
-              objData["position"][2].get<float>()),
-          glm::vec3(
-              objData["rotation"][0].get<float>(),
-              objData["rotation"][1].get<float>(),
-              objData["rotation"][2].get<float>()),
-          glm::vec3(
-              objData["scale"][0].get<float>(),
-              objData["scale"][1].get<float>(),
-              objData["scale"][2].get<float>()),
-          objData["name"].get<std::string>());
+      // Create object with transform data
+      Object obj(model,
+                 glm::vec3(objData["position"][0], objData["position"][1], objData["position"][2]),
+                 glm::vec3(objData["rotation"][0], objData["rotation"][1], objData["rotation"][2]),
+                 glm::vec3(objData["scale"][0], objData["scale"][1], objData["scale"][2]),
+                 objData["name"]);
+
+      // Add scripts if they exist
+      if (objData.contains("scripts") && objData["scripts"].is_array())
+      {
+        for (const auto &scriptData : objData["scripts"])
+        {
+          Script script(scriptData.get<std::string>());
+          obj.addScript(script);
+        }
+      }
 
       addObject(obj);
     }
     catch (const std::exception &e)
     {
       std::cerr << "Error loading object: " << e.what() << std::endl;
-      continue; // Skip this object and try to load others
+      continue;
     }
   }
 }

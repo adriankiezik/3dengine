@@ -7,7 +7,9 @@
 #include <filesystem>
 
 MenuBar::MenuBar(Window &window, Scene &scene, Camera &camera)
-    : window(window), scene(scene), camera(camera) {}
+    : window(window), scene(scene), camera(camera), 
+      showConsole(false), showHierarchy(false), 
+      showScripts(false), showDiagnostics(false) {}
 
 void MenuBar::render()
 {
@@ -101,7 +103,6 @@ void MenuBar::saveScene()
     return;
   }
 
-  std::cout << "Current project path: " << currentProjectPath << std::endl;
   std::filesystem::path projectPath(currentProjectPath);
   std::filesystem::path scenesDir = projectPath / "scenes";
   std::filesystem::path sceneFile = scenesDir / "scene.3dscene";
@@ -121,8 +122,7 @@ void MenuBar::saveScene()
     return;
   }
 
-  std::cout << "Saving scene to: " << sceneFile << std::endl;
-  std::cout << "Scene objects count: " << scene.getObjects().size() << std::endl;
+  std::cout << "Saving scene to: " << sceneFile.filename().string() << std::endl;
 
   std::ofstream sceneStream(sceneFile);
   if (!sceneStream.is_open())

@@ -1,7 +1,12 @@
 #include "hierarchy.h"
 #include <imgui.h>
+#include "imfilebrowser.h"
 
-HierarchyWindow::HierarchyWindow(Scene &scene) : scene(scene) {}
+HierarchyWindow::HierarchyWindow(Scene &scene) : scene(scene), fileDialog(ImGuiFileBrowserFlags_EnterNewFilename)
+{
+  fileDialog.SetTitle("Select Script File");
+  fileDialog.SetTypeFilters({".lua"});
+}
 
 void HierarchyWindow::render(bool &showHierarchy)
 {
@@ -9,24 +14,23 @@ void HierarchyWindow::render(bool &showHierarchy)
   {
     selectedObjectIndex = std::nullopt;
     showProperties = false;
+    showScriptFileDialog = false;
     return;
   }
 
-  // Render hierarchy window
   ImGui::Begin("Hierarchy", &showHierarchy);
   std::vector<Object> &objects = scene.getObjects();
   renderHierarchyList(objects);
   ImGui::End();
 
-  // Handle window closing
   if (!showHierarchy)
   {
     selectedObjectIndex = std::nullopt;
     showProperties = false;
+    showScriptFileDialog = false;
     return;
   }
 
-  // Render properties window if object is selected
   if (showProperties && selectedObjectIndex && *selectedObjectIndex < objects.size())
   {
     Object &object = objects[*selectedObjectIndex];
@@ -38,6 +42,15 @@ void HierarchyWindow::render(bool &showHierarchy)
     {
       selectedObjectIndex = std::nullopt;
     }
+  }
+
+  fileDialog.Display();
+  if (fileDialog.HasSelected() && scriptTargetObjectIndex)
+  {
+    Object &object = scene.getObjects()[*scriptTargetObjectIndex];
+    object.addScript(fileDialog.GetSelected().string());
+    fileDialog.ClearSelected();
+    scriptTargetObjectIndex = std::nullopt;
   }
 }
 
@@ -59,6 +72,34 @@ void HierarchyWindow::renderHierarchyList(std::vector<Object> &objects)
     {
       selectedObjectIndex = i;
       showProperties = true;
+    }
+
+    // Handle right-click context menu
+    if (ImGui::BeginPopupContextItem())
+    {
+      if (ImGui::MenuItem("Add Script"))
+      {
+        scriptTargetObjectIndex = i;
+        fileDialog.Open();
+      }
+      if (ImGui::MenuItem("Delete"))
+      {
+        objects.erase(objects.begin() + i);
+        if (selectedObjectIndex && *selectedObjectIndex == i)
+        {
+          selectedObjectIndex = std::nullopt;
+          showProperties = false;
+        }
+        ImGui::EndPopup();
+        break;
+      }
+      if (ImGui::MenuItem("Duplicate"))
+      {
+        Object newObject = object;
+        newObject.setName(object.getName() + "_copy");
+        objects.push_back(newObject);
+      }
+      ImGui::EndPopup();
     }
   }
 }
