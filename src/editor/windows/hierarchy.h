@@ -11,8 +11,10 @@ public:
   void render(bool &showHierarchy);
 
 private:
-  void renderObjectProperties();
-  
+  void renderHierarchyList(std::vector<Object> &objects);
+  void renderObjectProperties(Object &object);
+  void renderTransformProperties(Object &object);
+
   Scene &scene;
   std::optional<size_t> selectedObjectIndex;
   bool showProperties = false;

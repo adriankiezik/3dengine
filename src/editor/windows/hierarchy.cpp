@@ -8,16 +8,41 @@ void HierarchyWindow::render(bool &showHierarchy)
   if (!showHierarchy)
   {
     selectedObjectIndex = std::nullopt;
+    showProperties = false;
     return;
   }
 
+  // Render hierarchy window
   ImGui::Begin("Hierarchy", &showHierarchy);
-  if (!showHierarchy) // ImGui may set this to false if user clicks close button
+  std::vector<Object> &objects = scene.getObjects();
+  renderHierarchyList(objects);
+  ImGui::End();
+
+  // Handle window closing
+  if (!showHierarchy)
   {
     selectedObjectIndex = std::nullopt;
+    showProperties = false;
+    return;
   }
 
-  std::vector<Object> &objects = scene.getObjects();
+  // Render properties window if object is selected
+  if (showProperties && selectedObjectIndex && *selectedObjectIndex < objects.size())
+  {
+    Object &object = objects[*selectedObjectIndex];
+    ImGui::Begin("Object Properties", &showProperties);
+    renderObjectProperties(object);
+    ImGui::End();
+
+    if (!showProperties)
+    {
+      selectedObjectIndex = std::nullopt;
+    }
+  }
+}
+
+void HierarchyWindow::renderHierarchyList(std::vector<Object> &objects)
+{
   for (size_t i = 0; i < objects.size(); i++)
   {
     Object &object = objects[i];
@@ -36,33 +61,10 @@ void HierarchyWindow::render(bool &showHierarchy)
       showProperties = true;
     }
   }
-
-  ImGui::End();
-
-  if (showProperties && selectedObjectIndex)
-  {
-    renderObjectProperties();
-  }
 }
 
-void HierarchyWindow::renderObjectProperties()
+void HierarchyWindow::renderObjectProperties(Object &object)
 {
-  if (!selectedObjectIndex)
-    return;
-
-  std::vector<Object> &objects = scene.getObjects();
-  if (*selectedObjectIndex >= objects.size())
-    return;
-
-  Object &object = objects[*selectedObjectIndex];
-
-  ImGui::Begin("Object Properties", &showProperties);
-
-  if (!showProperties)
-  {
-    selectedObjectIndex = std::nullopt;
-  }
-
   // Name
   static char nameBuffer[256];
   strncpy(nameBuffer, object.getName().c_str(), sizeof(nameBuffer) - 1);
@@ -71,6 +73,11 @@ void HierarchyWindow::renderObjectProperties()
     object.setName(nameBuffer);
   }
 
+  renderTransformProperties(object);
+}
+
+void HierarchyWindow::renderTransformProperties(Object &object)
+{
   // Position
   glm::vec3 position = object.getPosition();
   if (ImGui::DragFloat3("Position", &position[0], 0.1f))
@@ -91,6 +98,4 @@ void HierarchyWindow::renderObjectProperties()
   {
     object.setScale(scale);
   }
-
-  ImGui::End();
 }
