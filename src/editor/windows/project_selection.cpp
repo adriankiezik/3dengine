@@ -4,11 +4,23 @@
 #include <nlohmann/json.hpp>
 #include <fstream>
 #include <iostream>
+#include <cstdlib>
+#include <filesystem>
 
 ProjectSelection::ProjectSelection(ProjectCreationWindow &projectCreationWindow, Window &window) : projectCreationWindow(projectCreationWindow), fileDialog(0), projectSelected(false), window(window)
 {
   fileDialog.SetTitle("Select Project File");
   fileDialog.SetTypeFilters({".3dproj"});
+
+  const char *homeDir = std::getenv("HOME");
+  if (homeDir != nullptr)
+  {
+    std::filesystem::path documentsPath = std::filesystem::path(homeDir) / "Documents";
+    if (std::filesystem::exists(documentsPath))
+    {
+      fileDialog.SetPwd(documentsPath);
+    }
+  }
 }
 
 void ProjectSelection::render()
