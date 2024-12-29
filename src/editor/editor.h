@@ -7,6 +7,7 @@
 #include "windows/hierarchy.h"
 #include "windows/diagnostics.h"
 #include "windows/scripts.h"
+#include "windows/project_selection.h"
 #include "../window.h"
 #include "../scene.h"
 #include "../script_system.h"
@@ -31,9 +32,9 @@ private:
   ConsoleStreamBuffer &console;
 
   bool initialized = false;
-  bool projectDialogShown = false;
 
   MenuBar menuBar;
+  ProjectSelection projectSelection;
   ViewportWindow viewportWindow;
   ConsoleWindow consoleWindow;
   HierarchyWindow hierarchyWindow;

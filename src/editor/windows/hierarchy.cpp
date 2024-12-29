@@ -65,7 +65,6 @@ void HierarchyWindow::renderHierarchyList(std::vector<Object> &objects)
 
 void HierarchyWindow::renderObjectProperties(Object &object)
 {
-  // Name
   static char nameBuffer[256];
   strncpy(nameBuffer, object.getName().c_str(), sizeof(nameBuffer) - 1);
   if (ImGui::InputText("Name", nameBuffer, sizeof(nameBuffer)))
@@ -78,21 +77,18 @@ void HierarchyWindow::renderObjectProperties(Object &object)
 
 void HierarchyWindow::renderTransformProperties(Object &object)
 {
-  // Position
   glm::vec3 position = object.getPosition();
   if (ImGui::DragFloat3("Position", &position[0], 0.1f))
   {
     object.setPosition(position);
   }
 
-  // Rotation
   glm::vec3 rotation = object.getRotation();
   if (ImGui::DragFloat3("Rotation", &rotation[0], 1.0f))
   {
     object.setRotation(rotation);
   }
 
-  // Scale
   glm::vec3 scale = object.getScale();
   if (ImGui::DragFloat3("Scale", &scale[0], 0.1f))
   {

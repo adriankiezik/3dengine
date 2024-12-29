@@ -17,7 +17,7 @@ Editor::Editor(Window &window, Scene &scene, Camera &camera,
       hierarchyWindow(scene),
       diagnosticsWindow(),
       scriptsWindow(),
-      projectDialogShown(false)
+      projectSelection()
 {
   if (!init())
   {
@@ -57,22 +57,27 @@ void Editor::shutdown()
 
 void Editor::update()
 {
+  if (!initialized)
+  {
+    initialized = true;
+  }
+
   startFrame();
 
-  if (!projectDialogShown)
+  if (!projectSelection.isProjectSelected())
   {
-    renderProjectDialog();
+    projectSelection.render();
+    endFrame();
+    return;
   }
-  else
-  {
-    menuBar.render();
 
-    viewportWindow.render();
-    consoleWindow.render(menuBar.showConsole);
-    hierarchyWindow.render(menuBar.showHierarchy);
-    scriptsWindow.render(menuBar.showScripts);
-    diagnosticsWindow.render(menuBar.showDiagnostics);
-  }
+  menuBar.render();
+
+  viewportWindow.render();
+  consoleWindow.render(menuBar.showConsole);
+  hierarchyWindow.render(menuBar.showHierarchy);
+  scriptsWindow.render(menuBar.showScripts);
+  diagnosticsWindow.render(menuBar.showDiagnostics);
 
   endFrame();
 }
@@ -88,36 +93,4 @@ void Editor::endFrame()
 {
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-}
-
-void Editor::renderProjectDialog()
-{
-  ImGui::OpenPopup("Project Selection");
-
-  ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-  ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
-
-  if (ImGui::BeginPopupModal("Project Selection", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-  {
-    ImGui::Text("Welcome to the 3D Engine!");
-    ImGui::Separator();
-
-    if (ImGui::Button("Create New Project", ImVec2(200, 0)))
-    {
-      // TODO: Implement new project creation
-      projectDialogShown = true;
-      ImGui::CloseCurrentPopup();
-    }
-
-    ImGui::Spacing();
-
-    if (ImGui::Button("Open Existing Project", ImVec2(200, 0)))
-    {
-      // TODO: Implement project opening
-      projectDialogShown = true;
-      ImGui::CloseCurrentPopup();
-    }
-
-    ImGui::EndPopup();
-  }
 }
