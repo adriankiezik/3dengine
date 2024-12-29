@@ -130,22 +130,34 @@ void ProjectCreationWindow::createProject()
   if (!std::filesystem::exists(projectDir))
   {
     std::filesystem::create_directories(projectDir);
+
+    // Create project subdirectories
+    auto assetsDir = projectDir / "assets";
+    auto scenesDir = projectDir / "scenes";
+    auto scriptsDir = projectDir / "scripts";
+
+    std::filesystem::create_directories(assetsDir);
+    std::filesystem::create_directories(scenesDir);
+    std::filesystem::create_directories(scriptsDir);
   }
 
   std::string projectFile = (projectDir / (projectName + ".3dproj")).string();
   std::ofstream file(projectFile);
   if (file.is_open())
   {
+    std::filesystem::path projectFilePath(projectFile);
+    auto projectFileDir = projectFilePath.parent_path();
+
     nlohmann::ordered_json projectData = {
         {"ProjectName", projectName},
         {"Description", projectDescription},
-        {"Path", projectPath}};
+    };
+
     file << projectData.dump(4);
     file.close();
 
     projectSelection.setProjectName(projectName);
     projectSelection.setProjectDescription(projectDescription);
-    projectSelection.setProjectPath(projectPath);
 
     hide();
     projectSelection.setProjectSelected(true);

@@ -59,10 +59,10 @@ void ProjectSelection::render()
       try
       {
         nlohmann::json projectData = nlohmann::json::parse(file);
+        file.close();
 
         setProjectName(projectData["ProjectName"]);
         setProjectDescription(projectData["Description"]);
-        setProjectPath(projectData["Path"]);
 
         window.setTitle("3dengine - " + projectData["ProjectName"].get<std::string>());
 
@@ -73,9 +73,23 @@ void ProjectSelection::render()
       {
         std::cerr << "Error loading project: " << e.what() << std::endl;
       }
-      file.close();
     }
   }
 
   ImGui::End();
+}
+
+void ProjectSelection::setProjectSelected(bool selected)
+{
+  projectSelected = selected;
+}
+
+void ProjectSelection::setProjectName(const std::string &name)
+{
+  projectName = name;
+}
+
+void ProjectSelection::setProjectDescription(const std::string &description)
+{
+  projectDescription = description;
 }

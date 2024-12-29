@@ -10,14 +10,14 @@ class ProjectSelection;
 class ProjectCreationWindow
 {
 public:
-  ProjectCreationWindow(ProjectSelection& projectSelection);
+  ProjectCreationWindow(ProjectSelection &projectSelection);
   void render();
   void show() { isVisible = true; }
   void hide() { isVisible = false; }
   bool isShown() const { return isVisible; }
 
 private:
-  ProjectSelection& projectSelection;
+  ProjectSelection &projectSelection;
   std::string projectName;
   std::string projectDescription;
   std::string projectPath;
