@@ -6,9 +6,16 @@ HierarchyWindow::HierarchyWindow(Scene &scene) : scene(scene) {}
 void HierarchyWindow::render(bool &showHierarchy)
 {
   if (!showHierarchy)
+  {
+    selectedObjectIndex = std::nullopt;
     return;
+  }
 
   ImGui::Begin("Hierarchy", &showHierarchy);
+  if (!showHierarchy) // ImGui may set this to false if user clicks close button
+  {
+    selectedObjectIndex = std::nullopt;
+  }
 
   std::vector<Object> &objects = scene.getObjects();
   for (size_t i = 0; i < objects.size(); i++)
@@ -50,6 +57,11 @@ void HierarchyWindow::renderObjectProperties()
   Object &object = objects[*selectedObjectIndex];
 
   ImGui::Begin("Object Properties", &showProperties);
+
+  if (!showProperties)
+  {
+    selectedObjectIndex = std::nullopt;
+  }
 
   // Name
   static char nameBuffer[256];
