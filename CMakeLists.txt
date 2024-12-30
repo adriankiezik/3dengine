@@ -3,15 +3,6 @@ cmake_minimum_required(VERSION 3.10)
 project(3dengine)
 set(CMAKE_CXX_STANDARD 17)
 
-# Jolt Physics options
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries" FORCE)
-set(INTERPROCEDURAL_OPTIMIZATION ON CACHE BOOL "Enable interprocedural optimizations" FORCE)
-set(USE_STATIC_MSVC_RUNTIME_LIBRARY ON CACHE BOOL "Use static MSVC runtime library" FORCE)
-set(TARGET_UNIT_TESTS OFF CACHE BOOL "Build unit tests" FORCE)
-set(TARGET_HELLO_WORLD OFF CACHE BOOL "Build hello world app" FORCE)
-set(TARGET_PERFORMANCE_TEST OFF CACHE BOOL "Build performance test app" FORCE)
-set(TARGET_SAMPLES OFF CACHE BOOL "Build samples" FORCE)
-
 find_package(OpenGL REQUIRED)
 
 # Include header only libs
