@@ -1,7 +1,12 @@
 [submodule "lib/sol"]
 	path = lib/sol
 	url = git@github.com:ThePhD/sol2.git
-
 [submodule "lib/json"]
 	path = lib/json
 	url = git@github.com:nlohmann/json.git
+[submodule "lib/glfw"]
+	path = lib/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "lib/assimp"]
+	path = lib/assimp
+	url = https://github.com/assimp/assimp.git

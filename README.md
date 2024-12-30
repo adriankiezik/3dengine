@@ -1,14 +1,18 @@
-Required to run:
+Required to build:
 
 - GPU that supports OpenGL 3.3
 - cmake (>= 3.10)
-- glfw (>= 3.3)
-- assimp
 
-To run:
+To build and run:
 
-- mkdir build
-- cd build/
-- cmake ..
-- cmake --build .
-- Run compiled executable
+Linux/MacOS:
+
+- `./build.sh`
+
+Windows:
+
+- `build.bat`
+
+The compiled executable will be in the `build` directory.
+
+If you're using Visual Studio Code, you have to configure include paths in c_cpp_properties.json as well. (for intellisense to work correctly, doesn't affect compilation)

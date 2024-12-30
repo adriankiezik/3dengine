@@ -3,30 +3,39 @@ cmake_minimum_required(VERSION 3.10)
 project(3dengine)
 set(CMAKE_CXX_STANDARD 17)
 
+find_package(OpenGL REQUIRED)
+
+# Include header only libs
 include_directories(include)
 include_directories(lib/imgui)
 include_directories(lib/imgui/backends)
 include_directories(lib/lua/src)
 include_directories(lib/sol/include)
-include_directories(lib/json/include)
 
-find_package(OpenGL REQUIRED)
-find_package(glfw3 3.3 REQUIRED)
-find_package(assimp REQUIRED)
+# Add submodule libs
+add_subdirectory(lib/glfw)
+add_subdirectory(lib/assimp)
+add_subdirectory(lib/json)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 file(GLOB_RECURSE IMGUI_SOURCES "lib/imgui/*.cpp")
-file(GLOB_RECURSE NLOHMANN_JSON_SOURCES "lib/json/include/*.hpp")
 file(GLOB LUA_SOURCES "lib/lua/src/*.c")
 
 add_library(glad src/glad.c)
 add_library(lua STATIC ${LUA_SOURCES})
 
-add_executable(${PROJECT_NAME} ${SOURCES} ${IMGUI_SOURCES} ${IMGUI_BACKEND_SOURCES} ${NLOHMANN_JSON_SOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES} ${IMGUI_SOURCES} ${IMGUI_BACKEND_SOURCES})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE EDITOR_MODE)
 
-target_link_libraries(${PROJECT_NAME} glad glfw lua assimp::assimp ${OPENGL_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} 
+    glad 
+    glfw 
+    assimp 
+    lua 
+    nlohmann_json::nlohmann_json
+    ${OPENGL_LIBRARIES}
+)
 
 if(APPLE)
     set(APP_BUNDLE_DIR "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.app")
