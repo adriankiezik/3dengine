@@ -10,3 +10,6 @@
 [submodule "lib/assimp"]
 	path = lib/assimp
 	url = https://github.com/assimp/assimp.git
+[submodule "lib/jolt"]
+	path = lib/jolt
+	url = https://github.com/jrouwe/JoltPhysics.git
