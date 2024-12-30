@@ -8,6 +8,7 @@ class ScriptViewerWindow
 {
 public:
   ScriptViewerWindow();
+  void init();
   void render(bool &show);
   void setScript(const std::string &path, const std::string &content);
 

@@ -8,7 +8,8 @@
 class ScriptsWindow
 {
 public:
-  explicit ScriptsWindow(Scene& scene);
+  ScriptsWindow(Scene& scene);
+  void init();
   void render(bool& showScripts);
 
 private:

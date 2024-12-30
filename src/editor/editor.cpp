@@ -45,6 +45,9 @@ bool Editor::init()
 
   initialized = true;
 
+  // Initialize windows that need ImGui context
+  scriptsWindow.init();
+
   return true;
 }
 

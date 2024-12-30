@@ -4,6 +4,11 @@
 
 ScriptsWindow::ScriptsWindow(Scene& scene) : scene(scene) {}
 
+void ScriptsWindow::init()
+{
+  scriptViewer.init();
+}
+
 void ScriptsWindow::render(bool& showScripts)
 {
   if (!showScripts)

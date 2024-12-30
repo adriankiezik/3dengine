@@ -32,6 +32,8 @@ void ProjectSelection::render()
 
   ImGui::Begin("Project Selection", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
+  ImGui::SetWindowSize(ImVec2(215, 115));
+
   ImGui::SetWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f - ImGui::GetWindowWidth() * 0.5f,
                              ImGui::GetIO().DisplaySize.y * 0.5f - ImGui::GetWindowHeight() * 0.5f));
 
