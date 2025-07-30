@@ -9,20 +9,36 @@ Mesh::Mesh(const std::vector<Vertex> &vertices, const std::vector<unsigned int> 
   setupMesh();
 }
 
+Mesh::Mesh(std::vector<Vertex> &&vertices, std::vector<unsigned int> &&indices, std::vector<Texture> &&textures)
+    : vertices(std::move(vertices)), indices(std::move(indices)), textures(std::move(textures))
+{
+  setupMesh();
+}
+
 void Mesh::Draw(Shader &shader)
 {
+  // Cache uniform locations if not done already
+  if (uniformLocations.size() != textures.size()) {
+    cacheUniformLocations(shader);
+  }
+
+  // Bind textures more efficiently
   for (unsigned int i = 0; i < textures.size(); i++)
   {
     glActiveTexture(GL_TEXTURE0 + i);
-    std::string name = textures[i].type;
-    glUniform1i(glGetUniformLocation(shader.id, textures[i].type.c_str()), i);
     glBindTexture(GL_TEXTURE_2D, textures[i].id);
+    
+    // Use cached uniform location instead of looking it up every frame
+    if (uniformLocations[i] != -1) {
+      glUniform1i(uniformLocations[i], i);
+    }
   }
 
   glBindVertexArray(VAO);
-  glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+  glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, 0);
   glBindVertexArray(0);
 
+  // Reset to default texture unit only once at the end
   glActiveTexture(GL_TEXTURE0);
 }
 
@@ -50,4 +66,15 @@ void Mesh::setupMesh()
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, texCoords));
 
   glBindVertexArray(0);
+}
+
+void Mesh::cacheUniformLocations(Shader &shader)
+{
+  uniformLocations.clear();
+  uniformLocations.reserve(textures.size());
+  
+  for (const auto &texture : textures) {
+    int location = glGetUniformLocation(shader.id, texture.type.c_str());
+    uniformLocations.push_back(location);
+  }
 }

@@ -10,6 +10,10 @@
 #include <memory>
 #include <nlohmann/json.hpp>
 
+struct Frustum {
+  glm::vec4 planes[6]; // left, right, bottom, top, near, far
+};
+
 class Scene
 {
 public:
@@ -30,6 +34,10 @@ private:
   Framebuffer &framebuffer;
   std::vector<Object> objects;
   Grid grid;
+  
+  // Frustum culling
+  Frustum extractFrustum(const glm::mat4& viewProjection);
+  bool isInFrustum(const Frustum& frustum, const glm::vec3& position, float radius = 1.0f);
 };
 
 #endif

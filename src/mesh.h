@@ -30,11 +30,18 @@ public:
   Mesh(const std::vector<Vertex> &vertices,
        const std::vector<unsigned int> &indices,
        const std::vector<Texture> &textures);
+  
+  // Move constructor for better performance
+  Mesh(std::vector<Vertex> &&vertices,
+       std::vector<unsigned int> &&indices,
+       std::vector<Texture> &&textures);
   void Draw(Shader &shader);
 
 private:
   unsigned int VBO, EBO;
+  std::vector<int> uniformLocations; // Cache uniform locations
   void setupMesh();
+  void cacheUniformLocations(Shader &shader);
 };
 
 #endif

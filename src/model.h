@@ -32,7 +32,7 @@ private:
   
   Shader shader;
   std::vector<Mesh> meshes;
-  std::unordered_map<std::string, Texture> loadedTextures;
+  static std::unordered_map<std::string, Texture> textureCache; // Global texture cache
 
   void loadModel(const std::string &modelPath, std::vector<std::pair<std::string, std::string>> texturePaths);
   void processNode(aiNode *node, const aiScene *scene, std::vector<std::pair<std::string, std::string>> texturePaths);

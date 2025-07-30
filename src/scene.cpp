@@ -19,9 +19,17 @@ void Scene::update()
 
   grid.render(glm::mat4(1.0f), camera.getViewMatrix(), camera.getProjectionMatrix(), camera.getPosition(), 100, glm::vec3(0.4f, 0.6f, 0.8f));
 
+  // Frustum culling optimization
+  glm::mat4 viewProjectionMatrix = camera.getProjectionMatrix() * camera.getViewMatrix();
+  Frustum frustum = extractFrustum(viewProjectionMatrix);
+
+  // Only render objects that are visible in the camera frustum
   for (Object &object : objects)
   {
-    object.Draw(camera.getPosition(), camera.getViewMatrix(), camera.getProjectionMatrix());
+    if (isInFrustum(frustum, object.getPosition(), 5.0f)) // 5.0f is a rough bounding radius
+    {
+      object.Draw(camera.getPosition(), camera.getViewMatrix(), camera.getProjectionMatrix());
+    }
   }
 
   framebuffer.unbind();
@@ -145,4 +153,78 @@ void Scene::fromJson(const nlohmann::json &json)
 void Scene::clear()
 {
   objects.clear();
+}
+
+Frustum Scene::extractFrustum(const glm::mat4& viewProjection)
+{
+  Frustum frustum;
+  
+  // Extract frustum planes from view-projection matrix
+  // Left plane
+  frustum.planes[0] = glm::vec4(
+    viewProjection[0][3] + viewProjection[0][0],
+    viewProjection[1][3] + viewProjection[1][0],
+    viewProjection[2][3] + viewProjection[2][0],
+    viewProjection[3][3] + viewProjection[3][0]
+  );
+  
+  // Right plane
+  frustum.planes[1] = glm::vec4(
+    viewProjection[0][3] - viewProjection[0][0],
+    viewProjection[1][3] - viewProjection[1][0],
+    viewProjection[2][3] - viewProjection[2][0],
+    viewProjection[3][3] - viewProjection[3][0]
+  );
+  
+  // Bottom plane
+  frustum.planes[2] = glm::vec4(
+    viewProjection[0][3] + viewProjection[0][1],
+    viewProjection[1][3] + viewProjection[1][1],
+    viewProjection[2][3] + viewProjection[2][1],
+    viewProjection[3][3] + viewProjection[3][1]
+  );
+  
+  // Top plane
+  frustum.planes[3] = glm::vec4(
+    viewProjection[0][3] - viewProjection[0][1],
+    viewProjection[1][3] - viewProjection[1][1],
+    viewProjection[2][3] - viewProjection[2][1],
+    viewProjection[3][3] - viewProjection[3][1]
+  );
+  
+  // Near plane
+  frustum.planes[4] = glm::vec4(
+    viewProjection[0][3] + viewProjection[0][2],
+    viewProjection[1][3] + viewProjection[1][2],
+    viewProjection[2][3] + viewProjection[2][2],
+    viewProjection[3][3] + viewProjection[3][2]
+  );
+  
+  // Far plane
+  frustum.planes[5] = glm::vec4(
+    viewProjection[0][3] - viewProjection[0][2],
+    viewProjection[1][3] - viewProjection[1][2],
+    viewProjection[2][3] - viewProjection[2][2],
+    viewProjection[3][3] - viewProjection[3][2]
+  );
+  
+  // Normalize planes
+  for (int i = 0; i < 6; i++) {
+    float length = glm::length(glm::vec3(frustum.planes[i]));
+    frustum.planes[i] /= length;
+  }
+  
+  return frustum;
+}
+
+bool Scene::isInFrustum(const Frustum& frustum, const glm::vec3& position, float radius)
+{
+  // Check if sphere (position + radius) is inside all frustum planes
+  for (int i = 0; i < 6; i++) {
+    float distance = glm::dot(glm::vec3(frustum.planes[i]), position) + frustum.planes[i].w;
+    if (distance < -radius) {
+      return false; // Object is completely outside this plane
+    }
+  }
+  return true; // Object is inside or intersecting the frustum
 }

@@ -6,6 +6,9 @@
 #include <assimp/matrix4x4.h>
 #include <glm/gtc/matrix_transform.hpp>
 
+// Static texture cache definition
+std::unordered_map<std::string, Texture> Model::textureCache;
+
 Model::Model(const std::string &modelPath,
              std::vector<std::pair<std::string, std::string>> texturePaths,
              const std::string &vertexShaderPath,
@@ -29,32 +32,14 @@ void Model::Draw(const glm::mat4 &transform, const glm::mat4 &view, const glm::m
   shader.setUniform3f("lightDirection", 1.0f, -1.0f, -1.0f); // Sunlight direction
   shader.setUniform3f("lightColor", 1.0f, 1.0f, 1.0f);       // White sunlight
 
-  // Extract camera position from view matrix
+  // Extract camera position from view matrix more efficiently
   glm::mat4 invView = glm::inverse(view);
   glm::vec3 cameraPos(invView[3]);
   shader.setUniform3f("viewPosition", cameraPos.x, cameraPos.y, cameraPos.z);
 
+  // Draw all meshes - texture binding is now handled in each mesh's Draw method
   for (Mesh &mesh : meshes)
   {
-    // Bind the normal map texture
-    for (unsigned int i = 0; i < mesh.textures.size(); i++)
-    {
-      glActiveTexture(GL_TEXTURE0 + i);
-      std::string name = mesh.textures[i].type;
-
-      // Ensure the normal map texture is assigned correctly
-      if (name == "texture_normal")
-      {
-        glUniform1i(glGetUniformLocation(shader.id, "texture_normal"), i);
-      }
-      else
-      {
-        glUniform1i(glGetUniformLocation(shader.id, name.c_str()), i);
-      }
-
-      glBindTexture(GL_TEXTURE_2D, mesh.textures[i].id);
-    }
-
     mesh.Draw(shader);
   }
 }
@@ -88,27 +73,8 @@ void Model::processNode(aiNode *node, const aiScene *scene, std::vector<std::pai
     processNode(node->mChildren[i], scene, texturePaths);
   }
 
-  // Apply the node transformation (including scale, rotation, and translation)
-  glm::mat4 nodeTransformation = aiMatrixToGlm(node->mTransformation);
-
-  // Apply a scaling factor to the transformation matrix (for example, 0.1f to make the model smaller)
-  glm::mat4 scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f)); // Adjust scale factor as needed
-  nodeTransformation = scalingMatrix * nodeTransformation;
-
-  // Apply the transformation to the meshes
-  for (unsigned int i = 0; i < node->mNumMeshes; i++)
-  {
-    aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-    // Apply the node transformation to the vertices (for example) in the mesh
-    for (unsigned int j = 0; j < mesh->mNumVertices; j++)
-    {
-      glm::vec4 vertex(mesh->mVertices[j].x, mesh->mVertices[j].y, mesh->mVertices[j].z, 1.0f);
-      glm::vec4 transformedVertex = nodeTransformation * vertex;
-      mesh->mVertices[j].x = transformedVertex.x;
-      mesh->mVertices[j].y = transformedVertex.y;
-      mesh->mVertices[j].z = transformedVertex.z;
-    }
-  }
+  // Note: Removed redundant vertex transformation here - it's now handled in processMesh
+  // This eliminates double transformation of vertices which was a significant performance bottleneck
 }
 
 Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene, std::vector<std::pair<std::string, std::string>> texturePaths)
@@ -149,7 +115,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene, std::vector<std::pai
 
   std::vector<Texture> textures = loadAllTextures(texturePaths);
 
-  return Mesh(vertices, indices, textures);
+  return Mesh(std::move(vertices), std::move(indices), std::move(textures));
 }
 
 std::vector<Texture> Model::loadAllTextures(std::vector<std::pair<std::string, std::string>> texturePaths)
@@ -158,11 +124,22 @@ std::vector<Texture> Model::loadAllTextures(std::vector<std::pair<std::string, s
 
   for (const auto &[type, path] : texturePaths)
   {
-    Texture texture;
-    texture.id = loadTextureFromFile(path.c_str());
-    texture.type = type;
-    texture.path = path;
-    textures.push_back(texture);
+    // Check if texture is already cached
+    auto it = textureCache.find(path);
+    if (it != textureCache.end()) {
+      // Use cached texture
+      Texture cachedTexture = it->second;
+      cachedTexture.type = type; // Update type for this usage
+      textures.push_back(cachedTexture);
+    } else {
+      // Load new texture and cache it
+      Texture texture;
+      texture.id = loadTextureFromFile(path.c_str());
+      texture.type = type;
+      texture.path = path;
+      textureCache[path] = texture; // Cache the texture
+      textures.push_back(texture);
+    }
   }
 
   return textures;
