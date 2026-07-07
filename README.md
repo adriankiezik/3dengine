@@ -14,7 +14,7 @@ A 3D engine written in C++ with OpenGL, built around its own editor rather than 
 
 ## Status
 
-Long-running personal project, developed on and off in spare time. Work in progress - expect rough edges and missing features (e.g. the diagnostics window and some menu items are stubs).
+Mostly a learning project — built on and off in spare time to explore engine architecture, OpenGL and scripting integration. Work in progress - expect rough edges and missing features (e.g. the diagnostics window and some menu items are stubs).
 
 ## Build
 
